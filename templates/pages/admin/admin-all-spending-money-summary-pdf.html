@@ -96,6 +96,7 @@
                 <th class="text-right">SET</th>
                 <th class="text-right">HET</th>
                 <th class="text-right">TRAINING</th>
+                <th class="text-right">Office</th>
                 <th class="text-right">စုစုပေါင်း</th>
             </tr>
         </thead>
@@ -107,6 +108,7 @@
                 <td class="text-right">{{ row.set_total|floatformat:0|mynum }}</td>
                 <td class="text-right">{{ row.het_total|floatformat:0|mynum }}</td>
                 <td class="text-right">{{ row.training_total|floatformat:0|mynum }}</td>
+                <td class="text-right">{{ row.office_total|floatformat:0|mynum }}</td>
                 <td class="text-right">{{ row.grand_total|floatformat:0|mynum }}</td>
             </tr>
             {% endfor %}

@@ -13,6 +13,7 @@
       <select name="department"
         class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
         <option value="all" {% if selected_dept == 'all' %}selected{% endif %}>ဌာနအားလုံး</option>
+        <option value="office" {% if selected_dept  == 'office' %}selected{% endif %}>ရုံးအသုံးစရိတ်</option>
         <option value="set" {% if selected_dept  == 'set' %}selected{% endif %}>Software Engineering (SET)</option>
         <option value="het" {% if selected_dept  == 'het' %}selected{% endif %}>Hardware Engineering (HET)</option>
         <option value="training" {% if selected_dept == 'training' %}selected{% endif %}>Training School</option>

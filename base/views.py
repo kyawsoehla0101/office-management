@@ -133,14 +133,14 @@ def admin_all_spending_money(request):
     "မတ်လ",         # 03
     "ဧပြီလ",       # 04
     "မေလ",          # 05
-    "ဇွန်လ",         # 06
-    "ဇူလိုင်လ",      # 07
-    "ဩဂုတ်လ",      # 08
-    "စက်တင်ဘာလ",    # 09
+    "ဂျုန်လ",         # 06
+    "ဂျူလိုင်လ",      # 07
+    "ဩဂတ်စ်လ",      # 08
+    "စပ်တမ်ဘာလ",    # 09
     "အောက်တိုဘာလ",  # 10
-    "နိုဝင်ဘာလ",     # 11
+    "နိုဗမ်ဘာလ",     # 11
     "ဒီဇင်ဘာလ",      # 12
-]
+    ]
 
     today = timezone.now()
     current_month = today.month
@@ -185,6 +185,9 @@ def admin_all_spending_money(request):
     if selected_dept in ["training", "all"]:
         qs = TrainingSpendingMoney.objects.filter(year=selected_year, **month_filter)
         annotate_total(qs, "TRAINING")
+    if selected_dept in ["office", "all"]:
+        qs = SpendingMoney.objects.filter(year=selected_year, **month_filter)
+        annotate_total(qs, "OFFICE")
 
     total_cost = sum(float(r.total_cost or 0) for r in spending_money)
     total_items = len(spending_money)
@@ -210,6 +213,20 @@ def admin_all_spending_money(request):
 @login_required(login_url="/")
 @role_required("admin")
 def admin_spending_money_summary(request):
+    MYANMAR_MONTHS = [
+    "ဇန်နဝါရီလ",   # 01
+    "ဖေဖော်ဝါရီလ", # 02
+    "မတ်လ",         # 03
+    "ဧပြီလ",       # 04
+    "မေလ",          # 05
+    "ဂျုန်လ",         # 06
+    "ဂျူလိုင်လ",      # 07
+    "ဩဂတ်စ်လ",      # 08
+    "စပ်တမ်ဘာလ",    # 09
+    "အောက်တိုဘာလ",  # 10
+    "နိုဗမ်ဘာလ",     # 11
+    "ဒီဇင်ဘာလ",      # 12
+    ]
     # --- Get selected year or default to current year
     today = timezone.now()
     current_year = today.year
@@ -220,7 +237,7 @@ def admin_spending_money_summary(request):
     # --- Prepare data containers
     summary_data = []
     yearly_total = 0
-    total_set = total_het = total_training = 0
+    total_set = total_het = total_training = total_office = 0
 
     # --- Quantity × Cost Expression
     total_expr = ExpressionWrapper(
@@ -231,7 +248,7 @@ def admin_spending_money_summary(request):
     # --- Generate all months summary
     for i in range(1, 13):
         month_num = str(i).zfill(2)
-        month_label = month_name[i]
+        month_label = MYANMAR_MONTHS[i-1]
 
         set_total = (
             SoftwareSpendingMoney.objects.filter(year=selected_year, month=month_num)
@@ -245,27 +262,33 @@ def admin_spending_money_summary(request):
             TrainingSpendingMoney.objects.filter(year=selected_year, month=month_num)
             .aggregate(total=Sum(total_expr))["total"] or 0
         )
+        office_total = (
+            SpendingMoney.objects.filter(year=selected_year, month=month_num)
+            .aggregate(total=Sum(total_expr))["total"] or 0
+        )
 
-        grand_total = set_total + het_total + training_total
+        grand_total = set_total + het_total + training_total + office_total
         yearly_total += grand_total
         total_set += set_total
         total_het += het_total
         total_training += training_total
+        total_office += office_total
 
         summary_data.append({
             "month": month_label,
             "set_total": set_total,
             "het_total": het_total,
             "training_total": training_total,
+            "office_total": office_total,
             "grand_total": grand_total,
         })
 
     # --- Export PDF Logic
     if "export" in request.GET and request.GET["export"] == "pdf":
-        return export_spending_money_pdf(summary_data, total_set, total_het, total_training, yearly_total, selected_year)
+        return export_spending_money_pdf(summary_data, total_set, total_het, total_training,total_office, yearly_total, selected_year)
 
     # --- Render normal HTML
-    years = range(current_year - 5, current_year + 2)
+    years = range(current_year - 16, current_year + 7)
     context = {
         "year": selected_year,
         "years": years,
@@ -276,6 +299,7 @@ def admin_spending_money_summary(request):
         "total_set": total_set,
         "total_het": total_het,
         "total_training": total_training,
+        "total_office": total_office,
         "active_menu": "admin_all_spending_money_summary",
     }
     return render(request, "pages/admin/admin-all-spending-money-summary.html", context)    
@@ -283,10 +307,7 @@ def admin_spending_money_summary(request):
 
 
 # Spending Money PDF Export Function
-@login_required(login_url="/")
-@role_required("admin")
-def export_spending_money_pdf(summary_data, total_set, total_het, total_training, yearly_total, year = to_myanmar_date_formatted(timezone.now())):
-
+def export_spending_money_pdf(summary_data, total_set, total_het, total_training,total_office, yearly_total, year = to_myanmar_date_formatted(timezone.now())):
 
     current_date = to_myanmar_date_formatted(timezone.now())
         # Myanmar month mapping

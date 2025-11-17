@@ -1,11 +1,12 @@
 {% extends 'layouts/main.html' %}
+{% load myanmar_nums %}
 {% block content %}
 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft max-w-12xl mx-auto">
 
   <div class="flex justify-between items-center mb-6">
     <div>
       <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
-        ဌာနအားလုံး၏ လိုအပ်ချက်များ စုစုပေါင်းစာရင်း ({{ year }})
+        {{ year|mynum }} ခုနှစ် အတွက် ဌာနအားလုံး၏ အသုံးစရိတ် စုစုပေါင်းစာရင်း 
       </h2>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         SET, HET, နှင့် TRAINING ဌာနရို့ရို့၏ လိုအပ်ချက်များ စုစုပေါင်း ကုန်ကျစရိတ်
@@ -14,18 +15,22 @@
   </div>
 
   <!-- 🧾 Department Totals -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
     <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-center">
-      <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">SET စုစုပေါင်း ကုန်ကျစရိတ်</p>
-      <p class="text-xl font-bold text-indigo-800 dark:text-indigo-200">{{ total_set|floatformat:0 }} ကျပ်</p>
+      <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">SET အတွက် ကုန်ကျစရိတ်</p>
+      <p class="text-xl font-bold text-indigo-800 dark:text-indigo-200">{{ total_set|floatformat:0|mynum }} ကျပ်</p>
     </div>
     <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl text-center">
-      <p class="text-sm font-semibold text-blue-700 dark:text-blue-300">HET စုစုပေါင်း ကုန်ကျစရိတ်</p>
-      <p class="text-xl font-bold text-blue-800 dark:text-blue-200">{{ total_het|floatformat:0 }} ကျပ်</p>
+      <p class="text-sm font-semibold text-blue-700 dark:text-blue-300">HET အတွက် ကုန်ကျစရိတ်</p>
+      <p class="text-xl font-bold text-blue-800 dark:text-blue-200">{{ total_het|floatformat:0|mynum }} ကျပ်</p>
     </div>
     <div class="p-4 bg-green-50 dark:bg-green-900/30 rounded-xl text-center">
-      <p class="text-sm font-semibold text-green-700 dark:text-green-300">TRAINING စုစုပေါင်း ကုန်ကျစရိတ်</p>
-      <p class="text-xl font-bold text-green-800 dark:text-green-200">{{ total_training|floatformat:0 }} ကျပ်</p>
+      <p class="text-sm font-semibold text-green-700 dark:text-green-300">သင်တန်းအတွက် ကုန်ကျစရိတ်</p>
+      <p class="text-xl font-bold text-green-800 dark:text-green-200">{{ total_training|floatformat:0|mynum }} ကျပ်</p>
+    </div>
+    <div class="p-4 bg-green-50 dark:bg-green-900/30 rounded-xl text-center">
+      <p class="text-sm font-semibold text-green-700 dark:text-green-300">ရုံး(ဌာန) အတွက် ကုန်ကျစရိတ်</p>
+      <p class="text-xl font-bold text-green-800 dark:text-green-200">{{ total_office|floatformat:0|mynum }} ကျပ်</p>
     </div>
   </div>
   <div class="flex justify-end">
@@ -34,7 +39,7 @@
   <select name="year" onchange="this.form.submit()"
           class="rounded-xl text-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2">
     {% for y in years %}
-      <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+      <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y|mynum }}</option>
     {% endfor %}
   </select>
 
@@ -59,27 +64,29 @@
           <th class="px-6 py-3 text-right font-semibold">SET စုစုပေါင်း ကုန်ကျစရိတ်</th>
           <th class="px-6 py-3 text-right font-semibold">HET စုစုပေါင်း ကုန်ကျစရိတ်</th>
           <th class="px-6 py-3 text-right font-semibold">TRAINING စုစုပေါင်း ကုန်ကျစရိတ်</th>
+          <th class="px-6 py-3 text-right font-semibold">ရုံး(ဌာန) စုစုပေါင်း ကုန်ကျစရိတ်</th>
           <th class="px-6 py-3 text-right font-semibold">စုစုပေါင်း ကုန်ကျစရိတ်</th>
         </tr>
       </thead>
       <tbody>
         {% for row in summary_data %}
         <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
-          <td class="px-6 py-3 font-medium">{{ row.month }}</td>
-          <td class="px-6 py-3 text-right">{{ row.set_total|floatformat:0 }} ကျပ် </td>
-          <td class="px-6 py-3 text-right">{{ row.het_total|floatformat:0 }} ကျပ် </td>
-          <td class="px-6 py-3 text-right">{{ row.training_total|floatformat:0 }} ကျပ် </td>
+          <td class="px-6 py-3 font-medium">{{ row.month|default_if_none:"" }}</td>
+          <td class="px-6 py-3 text-right">{{ row.set_total|floatformat:0|mynum }} ကျပ် </td>
+          <td class="px-6 py-3 text-right">{{ row.het_total|floatformat:0|mynum }} ကျပ် </td>
+          <td class="px-6 py-3 text-right">{{ row.training_total|floatformat:0|mynum }} ကျပ် </td>
+          <td class="px-6 py-3 text-right">{{ row.office_total|floatformat:0|mynum }} ကျပ် </td>
           <td class="px-6 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">
-            {{ row.grand_total|floatformat:0 }} ကျပ်
+            {{ row.grand_total|floatformat:0|mynum }} ကျပ်
           </td>
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr class="bg-slate-200 dark:bg-slate-800 font-semibold">
-          <td class="px-6 py-3 text-right" colspan="4">{{ year }} ခုနှစ်၏စုစုပေါင်း ကုန်ကျစရိတ် (အားလုံး)</td>
+          <td class="px-6 py-3 text-right" colspan="5">{{ year|mynum }} ခုနှစ်၏စုစုပေါင်း ကုန်ကျစရိတ် (အားလုံး)</td>
           <td class="px-6 py-3 text-right text-indigo-700 dark:text-indigo-300">
-            {{ yearly_total|floatformat:0 }} ကျပ် 
+            {{ yearly_total|floatformat:0|mynum }} ကျပ် 
           </td>
         </tr>
       </tfoot>
