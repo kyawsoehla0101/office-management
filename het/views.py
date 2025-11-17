@@ -18,6 +18,8 @@ from datetime import datetime
 from calendar import month_name
 from django.db.models import F
 from base.models import SystemSettings
+from django.contrib.auth.decorators import login_required
+from base.utils import date_utils
 
 
 
@@ -189,214 +191,7 @@ def deleteMember(request,id):
         return redirect('het.members')
     return render(request, 'pages/het/members/member-delete.html', context)
 
-@role_required("het", "admin")
-def requirements(request):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    today = timezone.now()
-    current_month = today.month
-    current_year = today.year
 
-    # Default month/year
-    selected_month = request.GET.get("month")
-    selected_year = request.GET.get("year")
-
-    # 🧩 Handle defaults
-    if not selected_month:
-        selected_month = str(current_month)
-    if not selected_year:
-        selected_year = str(current_year)
-
-    # 🔹 filtering logic
-    if selected_month == "all":
-        requirements = HardwareSpendingMoney.objects.filter(year=selected_year)
-    else:
-        try:
-            selected_month_int = int(selected_month)
-        except ValueError:
-            selected_month_int = current_month
-
-        requirements = HardwareSpendingMoney.objects.filter(  
-            month=selected_month_int, year=selected_year
-        )
-
-    # 🧾 Calculate total
-    total_cost = sum(r.total_cost() for r in requirements)
-
-    # Dropdown lists
-    months = [("all", "All Months")] + [(i, month_name[i]) for i in range(1, 13)]
-    years = range(current_year - 5, current_year + 3)
-
-    context = {
-        "system_name": system_name,
-        "organization": organization,
-        "requirements": requirements,
-        "total_cost": total_cost,
-        "months": months,
-        "years": years,
-        "selected_month": selected_month,
-        "selected_year": int(selected_year),
-        "active_menu": "het_requirements",
-    }
-    return render(request, "pages/het/requirements/requirements.html", context)
-
-def requirements_summary(request):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    today = timezone.now()
-    current_year = today.year
-
-    # Group by month and sum total cost
-    monthly_totals = (
-        HardwareSpendingMoney.objects
-        .filter(year=current_year)
-        .values("month")
-        .annotate(total=Sum(F("estimated_cost") * F("quantity")))
-        .order_by("month")
-    )
-
-    # Calculate total yearly cost
-    yearly_total = sum([m["total"] or 0 for m in monthly_totals])
-
-    # Convert month numbers to names
-    from calendar import month_name
-    for m in monthly_totals:
-        m["month_name"] = month_name[int(m["month"])]
-
-    context = {
-        "system_name": system_name,
-        "organization": organization,
-        "monthly_totals": monthly_totals,
-        "yearly_total": yearly_total,
-        "year": current_year,
-        "active_menu": "het_requirements_summary",
-    }
-    return render(request, "pages/het/requirements/requirement-summary.html", context)
-
-@role_required("het", "admin")
-def addRequirement(request):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    from .models import HardwareRequirement
-    if request.method == "POST":
-        item = HardwareRequirement(
-            item_name=request.POST.get("item_name"),
-            category=request.POST.get("category"),
-            quantity=request.POST.get("quantity") or 1,
-            unit=request.POST.get("unit") or "pcs",
-            estimated_cost=request.POST.get("estimated_cost") or 0,
-            month=request.POST.get("month"),
-            year=request.POST.get("year"),
-            description=request.POST.get("description"),
-            requested_by=request.user,
-        )
-        if request.FILES.get("attachment"):
-            item.attachment = request.FILES["attachment"]
-        item.save()
-        messages.success(request, "Monthly requirement submitted successfully!")
-        return redirect("het.requirements")
-
-    month_choices = HardwareRequirement.MONTH_CHOICES
-    return render(request, "pages/het/requirements/add-requirement.html", {"system_name": system_name, "organization": organization, "month_choices": month_choices, "active_menu": "het_requirements"})
-@role_required("het", "admin")
-def viewRequirement(request, id):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    requirement = get_object_or_404(HardwareRequirement, id=id)
-    return render(request, "pages/het/requirements/view-requirement.html", {"system_name": system_name, "organization": organization, "requirement": requirement, "active_menu": "het_requirements"})
-
-@role_required("het", "admin")
-def editRequirement(request, id):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    requirement = get_object_or_404(HardwareRequirement, id=id)
-    today = timezone.now()
-    current_year = today.year
-
-    months = [(i, month_name[i]) for i in range(1, 13)]
-    years = range(current_year - 5, current_year + 3)
-
-    categories = [
-        ("electrical", "Electrical Equipment"),
-        ("computer", "Computer Device"),
-        ("network", "Network Tools"),
-        ("office", "Office Supplies"),
-        ("other", "Other"),
-    ]
-
-    if request.method == "POST":
-        requirement.item_name = request.POST.get("item_name")
-        requirement.category = request.POST.get("category")
-        requirement.quantity = request.POST.get("quantity") or 0
-        requirement.estimated_cost = request.POST.get("estimated_cost") or 0
-        requirement.month = request.POST.get("month")
-        requirement.year = request.POST.get("year")
-        requirement.description = request.POST.get("description")
-
-        if request.FILES.get("attachment"):
-            requirement.attachment = request.FILES["attachment"]
-
-        requirement.save()
-        return redirect("het.requirements")
-
-    return render(request, "pages/het/requirements/edit-requirement.html", {
-        "system_name": system_name,
-        "organization": organization,
-        "requirement": requirement,
-        "months": months,
-        "years": years,
-        "categories": categories,
-        "active_menu": "het_requirements",
-    })
-@role_required("het", "admin")
-def deleteRequirement(request, id):
-    system_name = SystemSettings.objects.first().system_name
-    organization = SystemSettings.objects.first().organization
-    requirement = get_object_or_404(HardwareRequirement, id=id)
-    if request.method == "POST":
-        requirement.delete()
-        return redirect("het.requirements")
-
-    return render(request, "pages/het/requirements/delete-requirement.html", {"system_name": system_name, "organization": organization, "requirement": requirement, "active_menu": "het_requirements"})
-
-@role_required("het", "admin")
-# def reports(request):
-#     q = request.GET.get("q", "")
-#     status = request.GET.get("status", "")
-#     current_month = timezone.now().month
-#     current_year = timezone.now().year
-
-#     # --- For month/year filter ---
-#     months = [("","All Months")] + [(i, f"{i} လ") for i in range(1, 13)]
-#     years = [("","All Years")] + [(y, str(y)) for y in range(current_year-3, current_year+2)]
-#     repairs = HardwareRepair.objects.all().order_by("-completed_date")
-#     # Get filter values from GET
-#     selected_month = request.GET.get("month", str(current_month))
-#     selected_year = request.GET.get("year", str(current_year))
-#     if q:
-#         repairs = repairs.filter(device_name__icontains=q) | repairs.filter(technician__full_name__icontains=q) | repairs.filter(ticket_id__icontains=q)
-#     if status:
-#         repairs = repairs.filter(status=status)
-#     # 👉 Month & Year Filter (IMPORTANT)
-#     if selected_month not in ["", "all"]:
-#         repairs = repairs.filter(created_at__month=selected_month)
-
-#     if selected_year not in ["", "all"]:
-#         repairs =repairs.filter(created_at__year=selected_year)   
-
-#     if selected_year:
-#         repairs = repairs.filter(completed_date__year=selected_year)
-#     return render(request, "pages/het/reports/reports.html", {
-#         "current_month": current_month,
-#         "current_year": current_year,
-#         "selected_month": selected_month,
-#         "selected_year": selected_year,
-#         "months": months,
-#         "years": years,
-#         "repairs": repairs,
-#         "status_choices": HardwareRepair.STATUS_CHOICES,
-#         "active_menu": "het_reports",
-#     })
 def reports(request):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
@@ -877,4 +672,69 @@ def export_repair_pdf(request, id):
 
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{repair.ticket_id}.pdf"'
+    return response
+
+
+
+from rest_framework import generics, permissions
+from datetime import datetime
+from .serializers import HardwareSpendingMoneySerializer
+from .models import HardwareSpendingMoney
+
+# Spending Money API View
+
+class SpendingMoneyListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = HardwareSpendingMoneySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = HardwareSpendingMoney.objects.all().order_by("-created_at")
+        month = self.request.GET.get("month")
+        year = self.request.GET.get("year")
+        if month and month != "all":
+            qs = qs.filter(month=month)
+        if year and year != "all":
+            qs = qs.filter(year=year)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+# Spending Money Detail API View
+
+class SpendingMoneyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = HardwareSpendingMoney.objects.all()
+    serializer_class = HardwareSpendingMoneySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Spending Money Page View
+@login_required(login_url="/")
+@role_required("admin", "het")
+def spending_page(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    
+    months = HardwareSpendingMoney.MONTH_CHOICES
+    
+    years = range(2023, datetime.now().year + 6)
+    return render(request, "pages/het/spending-money/spending_page.html", {"months": months, "years": years, "system_name": system_name, "organization": organization, "active_menu": "het_spending_page"})
+
+# Spending Money PDF Export View
+@login_required(login_url="/")
+@role_required("admin", "het")
+def export_spending_pdf(request):
+    month = request.GET.get("month", "all")
+    year = request.GET.get("year", datetime.now().year)
+    qs = HardwareSpendingMoney.objects.all()
+    current_date = date_utils.to_myanmar_date_formatted(datetime.now())
+
+    if month != "all":
+        qs = qs.filter(month=month)
+    if year != "all":
+        qs = qs.filter(year=year)
+    total_sum = sum([r.total_cost for r in qs])
+    html = render_to_string("pages/het/spending-money/spending_pdf.html", {"records": qs, "total_sum": total_sum, "month": month, "year": year, "current_date": current_date})
+    pdf = HTML(string=html).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="spending_{month}_{year}.pdf"'
     return response
