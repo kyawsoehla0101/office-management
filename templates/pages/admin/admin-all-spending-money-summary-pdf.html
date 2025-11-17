@@ -1,0 +1,152 @@
+{% load myanmar_nums %}
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <title>Requirements Summary - {{ year }}</title>
+
+    <style>
+        @page { size: A4; margin: 15mm;@top-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+    }
+    @bottom-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+
+    } }
+        body { font-family: 'Pyidaungsu', sans-serif; }
+
+        h1 {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            text-align: right;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 6px;
+        }
+
+        th {
+            background: #e5e7eb;
+            font-weight: bold;
+        }
+
+        .summary-title {
+            margin-top: 16px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .summary-table {
+            width: 60%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .summary-table th, .summary-table td {
+            border: 1px solid #999;
+            padding: 6px;
+            font-size: 12px;
+        }
+
+        .summary-table th {
+            background: #f3f4f6;
+        }
+.header-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 3px; }
+    .sub-header { text-align: center; font-size: 14px; margin-bottom: 10px; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-title">အာရက္ခတပ်တော်</div>
+  <div class="header-title">စစ် ရုံး ချုပ်</div>
+  <div class="header-title">ကွန်ပျူတာအဖွဲ့</div>
+
+  <div class="sub-header" style="font-size:16px; margin-bottom:5px;">
+    {{ year }} ခုနှစ် အတွက် ဌာနဆိုင်ရာအလိုက် သုံးစွဲမှု ငွီစာရင်းအကျဉ်းချုပ်</div>
+    <p class="date"><b>နိစွဲ၊ </b>{{ current_date }}</p>
+
+    <!-- MAIN MONTHLY TABLE -->
+    <table>
+        <thead>
+            <tr style="text-align:center;">
+                <th>လ</th>
+                <th class="text-right">SET</th>
+                <th class="text-right">HET</th>
+                <th class="text-right">TRAINING</th>
+                <th class="text-right">စုစုပေါင်း</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in summary_data %}
+            <tr style="text-align:center;">
+                <td>{{ row.month_mm }}</td>
+                <td class="text-right">{{ row.set_total|floatformat:0|mynum }}</td>
+                <td class="text-right">{{ row.het_total|floatformat:0|mynum }}</td>
+                <td class="text-right">{{ row.training_total|floatformat:0|mynum }}</td>
+                <td class="text-right">{{ row.grand_total|floatformat:0|mynum }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- SUMMARY TOTAL TABLE -->
+    <div class="summary-title">စုစုပေါင်း အကျဉ်းချုပ်</div>
+
+    <table class="summary-table">
+        <tr>
+            <th>SET Total</th>
+            <td class="text-right">{{ total_set|floatformat:0|mynum }} ကျပ်</td>
+        </tr>
+        <tr>
+            <th>HET Total</th>
+            <td class="text-right">{{ total_het|floatformat:0|mynum }} ကျပ်</td>
+        </tr>
+        <tr>
+            <th>TRAINING Total</th>
+            <td class="text-right">{{ total_training|floatformat:0|mynum }} ကျပ်</td>
+        </tr>
+
+        <tr>
+            <th><b>တစ်နှစ်အတွက် ကုန်ကျငွီ</b></th>
+            <td class="text-right"><b>{{ yearly_total|floatformat:0|mynum }} ကျပ်</b></td>
+        </tr>
+    </table>
+    <div style="position: absolute;right: 0;margin-top: 50px;">
+    <div style="font-size:14px;">
+        <div>
+            နာမေ
+        </div>
+        <div>
+            ကွန်ပျူတာအဖွဲ့၊ စစ်ရုံးချုပ်
+        </div>
+        <div>
+            အာရက္ခတပ်တော်
+        </div>
+    </div>
+
+</body>
+</html>

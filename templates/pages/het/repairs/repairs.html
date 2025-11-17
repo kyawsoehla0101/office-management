@@ -1,0 +1,164 @@
+{% extends 'layouts/main.html' %}
+{% load myanmar_nums %}
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900">
+<!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'het.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+            </path>
+          </svg>
+          ပင်မစာမျက်နှာ
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="#" class="ml-1 text-sm font-medium text-slate-700 hover:text-blue-600 md:ml-2 dark:text-slate-300 dark:hover:text-blue-400">
+            ပစ္စည်းများ
+          </a>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Hardware Repair Tasks</h2>
+      <p class="text-slate-500 text-sm">All logged device repair and maintenance activities.</p>
+    </div>
+    <a href="{% url 'het.add-repair' %}"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 shadow-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      ပစ္စည်းများ အသစ်ထည့်ရန်
+    </a>
+  </div>
+<!-- Filter -->
+  <form method="get" class="flex flex-wrap grid grid-cols-9 gap-2 mb-5">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="ပစ္စည်းအမည်၊ ပစ္စည်းနံပါတ် သို့မဟုတ် ပြုလုပ်သူ အားယှာဖွီရန်..."
+      class="rounded-xl col-span-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+    <select name="status"
+      class="rounded-xl border border-slate-300 col-span-1 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm px-2 py-2 focus:ring-2 focus:ring-green-500">
+      <option value="">အခြီအနီအားလုံး</option>
+      {% for value,label in status_choices %}
+      <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit"
+      class="px-4 py-2 col-span-1 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm shadow-sm">
+      စစ်ထုတ်မည်
+    </button>
+  </form>
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+    <div class="bg-green-50 dark:bg-slate-800 rounded-2xl p-5 text-center border border-green-100 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400">ပစ္စည်းစုစုပေါင်း</p>
+      <p class="text-3xl font-bold text-green-700 dark:text-green-400">{{ total_repairs|default:0|mynum }}</p>
+    </div>
+    <div class="bg-yellow-50 dark:bg-slate-800 rounded-2xl p-5 text-center border border-yellow-100 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400">စောင့်ဆိုင်းမှု</p>
+      <p class="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{{ pending_repairs|default:0|mynum }}</p>
+    </div>
+    <div class="bg-blue-50 dark:bg-slate-800 rounded-2xl p-5 text-center border border-blue-100 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400">လုပ်နိန်ဆဲ</p>
+      <p class="text-3xl font-bold text-blue-700 dark:text-blue-400">{{ progress_repairs|default:0|mynum }}</p>
+    </div>
+    <div class="bg-green-100 dark:bg-slate-800 rounded-2xl p-5 text-center border border-green-100 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400">ပြီးစီးမှု</p>
+      <p class="text-3xl font-bold text-green-800 dark:text-green-400">{{ completed_repairs|default:0|mynum }}</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+    <table class="w-full text-sm text-left text-slate-700 dark:text-slate-300">
+      <thead class="bg-green-100 dark:bg-slate-800 text-green-900 dark:text-green-400 uppercase text-xs">
+        <tr>
+          <th class="px-6 py-3">ပစ္စည်းနံပါတ်</th>
+          <th class="px-6 py-3">ပစ္စည်းအမည်</th>
+          <th class="px-6 py-3">ပြုလုပ်သူ</th>
+          <th class="px-6 py-3">ဦးစားပီးအဆင့်</th>
+          <th class="px-6 py-3">အခြီအနီ</th>
+          <th class="px-6 py-3">လက်ခံသောနိရက်</th>
+          <th class="px-6 py-3 text-center">လုပ်ဆောင်မှုများ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for repair in repairs %}
+        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4 font-medium text-slate-800 dark:text-slate-200">{{ repair.ticket_id }}</td>
+          <td class="px-6 py-4">
+            <p class="font-semibold">{{ repair.device_name }}</p>
+            <p class="text-xs text-slate-500">{{ repair.get_device_type_display }}</p>
+          </td>
+          <td class="px-6 py-4">
+            {% if repair.technician %}
+            {{ repair.technician.full_name }}
+            {% else %}
+            <span class="text-slate-400 italic">Unassigned</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-1 rounded-full text-xs font-medium 
+              {% if repair.priority == 'urgent' %}
+                bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200
+              {% elif repair.priority == 'high' %}
+                bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200
+              {% elif repair.priority == 'medium' %}
+                bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200
+              {% else %}
+                bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200
+              {% endif %}">
+              {{ repair.get_priority_display }}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-medium {{ repair.get_status_color }}">
+              {{ repair.get_status_display }}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-slate-600 dark:text-slate-400">{{ repair.received_date }}</td>
+          <td class="px-6 py-4 text-center">
+            <div class="flex justify-center gap-2">
+              <a href="{% url 'het.view-repair' repair.id %}"
+                class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-slate-800 dark:text-blue-400 dark:hover:bg-slate-700 text-xs font-medium">
+                ကြည့်မည်
+              </a>
+              <a href="{% url 'het.edit-repair' repair.id %}"
+                class="px-3 py-1 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:bg-slate-800 dark:text-yellow-400 dark:hover:bg-slate-700 text-xs font-medium">
+                ပြုပြင်မည်
+              </a>
+              <a href="{% url 'het.delete-repair' repair.id %}"
+                class="px-3 py-1 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-slate-700 text-xs font-medium">
+                ဖျက်မည်
+              </a>
+              <a href="{% url 'het.export-repair-pdf' repair.id %}" 
+               class="text-green-600 hover:underline" target="_blank">
+             PDF ထုတ်မည်
+            </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400">ပစ္စည်းများ မဟိပါ</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

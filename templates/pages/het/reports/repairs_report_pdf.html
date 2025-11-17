@@ -1,0 +1,137 @@
+{% load myanmar_nums %}
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>Hardware Repair PDF Report</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm 10mm 10mm 10mm; 
+    @top-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+    }
+    @bottom-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+
+    }
+    }
+
+    body { font-family: 'Pyidaungsu', sans-serif; }
+    .atwinye { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #1e293b; color: white; padding: 8px; }
+    td { padding: 6px; border: 1px solid #ccc; }
+
+    .header-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 3px; }
+    .sub-header { text-align: center; font-size: 14px; margin-bottom: 10px; }
+    .date-right { text-align: right; font-size: 12px; margin-bottom: 10px; }
+
+    /* Summary styles */
+    .summary-wrap { margin-top: 14px; }
+    .summary-title { font-weight: bold; margin: 6px 0 8px; font-size: 13px; }
+    .summary-table { width: 60%; border-collapse: collapse; font-size: 12px; }
+    .summary-table th, .summary-table td { border: 1px solid #cbd5e1; padding: 8px; }
+    .summary-head { background: #f1f5f9; }
+    .text-right { text-align: right; }
+  </style>
+</head>
+
+<body>
+
+  <div class="header-title">အာရက္ခတပ်တော်</div>
+  <div class="header-title">စစ် ရုံး ချုပ်</div>
+  <div class="header-title">ကွန်ပျူတာအဖွဲ့</div>
+
+  <div class="sub-header" style="font-size:16px; margin-bottom:5px;">
+    ကွန်ပျူတာ၊ ဖုန်းနှင့် အပိုပစ္စည်း ပြုပြင်ရီး အစီရင်ခံစာ</div>
+
+  <p class="date-right"><b>နိစွဲ၊ </b> {{ current_date }}</p>
+
+  <table>
+    <thead>
+      <tr style="text-align: center;">
+        <th>ပစ္စည်းနံပါတ်</th>
+        <th>ပစ္စည်းအမျိုးအစား</th>
+        <th>ပြုပြင်သူ</th>
+        <th>အခြီအနီ</th>
+        <th>စလုပ်သောနိ</th>
+        <th>ပြီးသောနိ</th>
+        <th>ကုန်ကျမှု (ကျပ်)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in repairs %}
+      <tr style="text-align: center;">
+        <td>{{ r.ticket_id }}</td>
+        <td>{{ r.device_name }}</td>
+        <td>{{ r.technician.full_name|default:"-" }}</td>
+        <td>{{ r.get_status_display }}</td>
+        <td>{{ r.start_date|date:"d-m-Y"|default:"-" }}</td>
+        <td>{{ r.completed_date|date:"d-m-Y"|default:"-" }}</td>
+        <td class="text-right">
+          {{ r.cost_estimate|default:0|floatformat:2|mynum }} ကျပ်
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ✅ Summary -->
+  <div class="summary-wrap" >
+    <div class="summary-title">အကျဉ်းချုပ်</div>
+    <table class="summary-table">
+      <thead>
+        <tr class="summary-head">
+          <th>အမျိုးအစား</th>
+          <th class="text-right">အရီအတွက်</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>စုစုပေါင်း ပြုပြင်စာရင်း</td>
+          <td class="text-right">{{ total_repairs|mynum }}</td>
+        </tr>
+        <tr>
+          <td>ပြီးစီးမှုစာရင်း</td>
+          <td class="text-right">{{ completed_count|mynum }}</td>
+        </tr>
+        <tr>
+          <td>လက်ရှိ ဆောင်ရွက်ထားမှု</td>
+          <td class="text-right">{{ in_progress_count|mynum }}</td>
+        </tr>
+        <tr>
+          <td>စောင့်ဆိုင်းပြီးမှုစာရင်း</td>
+          <td class="text-right">{{ pending_count|mynum }}</td>
+        </tr>
+        <tr>
+          <td>ဖျက်သိမ်း</td>
+          <td class="text-right">{{ cancelled_count|mynum }}</td>
+        </tr>
+        <tr>
+          <td><b>စုစုပေါင်း ကုန်ကျစရိတ်</b></td>
+          <td class="text-right"><b>{{ total_cost|floatformat:2|mynum }} ကျပ်</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="position: absolute;right: 0;margin-top: 50px;">
+    <div style="font-size:14px;">
+        <div>
+            နာမေ
+        </div>
+        <div>
+            ကွန်ပျူတာအဖွဲ့၊ စစ်ရုံးချုပ်
+        </div>
+        <div>
+            အာရက္ခတပ်တော်
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

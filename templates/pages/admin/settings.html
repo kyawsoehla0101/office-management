@@ -1,0 +1,165 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'dashboard' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z">
+            </path>
+          </svg>
+          Admin Home
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="#" class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
+            Settings
+          </a>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">System Settings</h2>
+      <p class="text-slate-500 text-sm">Manage global system preferences, theme, and notification settings.</p>
+    </div>
+    <!-- <button
+      class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center gap-2 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd"
+          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+          clip-rule="evenodd" />
+      </svg>
+      Save Settings
+    </button> -->
+  </div>
+
+  <!-- Settings Form -->
+  <form method="POST" action="" class="space-y-10">
+    {% csrf_token %}
+
+    <!-- System Section -->
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        General Information
+      </h3>
+
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">System Name</label>
+          <input type="text" name="system_name" value="{{ system_name|default:'Engineering Management Dashboard' }}"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Organization</label>
+          <input type="text" name="organization" value="{{ organization|default:'Software Engineering Team II' }}"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- Appearance Section -->
+    <!-- <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v1m0 16v1m8.66-8.66l.71.71M3.63 3.63l.71.71M21 12h1M2 12H1m16.97 4.24l.71.71M4.24 4.24l.71.71" />
+        </svg>
+        Appearance
+      </h3>
+
+      <div class="flex items-center gap-5">
+        <label class="flex items-center space-x-2">
+          <input type="radio" name="theme" value="light" class="text-indigo-600"
+            {% if theme == 'light' %}checked{% endif %}>
+          <span class="text-sm text-slate-700 dark:text-slate-300">Light Mode</span>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input type="radio" name="theme" value="dark" class="text-indigo-600"
+            {% if theme == 'dark' %}checked{% endif %}>
+          <span class="text-sm text-slate-700 dark:text-slate-300">Dark Mode</span>
+        </label>
+      </div>
+    </div> -->
+
+    <!-- Notifications Section -->
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        Notifications
+      </h3>
+
+      <div class="space-y-2">
+        <label class="flex items-center gap-3">
+          <input type="checkbox" name="email_notifications" {% if email_notifications %}checked{% endif %}
+            class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+          <span class="text-sm text-slate-700 dark:text-slate-300">Email Alerts</span>
+        </label>
+        <label class="flex items-center gap-3">
+          <input type="checkbox" name="system_warnings" {% if system_warnings %}checked{% endif %}
+            class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+          <span class="text-sm text-slate-700 dark:text-slate-300">System Warnings</span>
+        </label>
+        <label class="flex items-center gap-3">
+          <input type="checkbox" name="weekly_reports" {% if weekly_reports %}checked{% endif %}
+            class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+          <span class="text-sm text-slate-700 dark:text-slate-300">Weekly Reports</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Security Section -->
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 11c.667 0 2 .333 2 2s-1.333 2-2 2-2-.333-2-2 1.333-2 2-2zm0 0V7m0 8v2m8-6a9 9 0 11-16 0 9 9 0 0116 0z" />
+        </svg>
+        Security
+      </h3>
+
+      <div class="grid sm:grid-cols-2 gap-5">
+        <!-- <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Minimum Password Length</label>
+          <input type="number" name="min_password_length" value="{{ min_password_length|default:8 }}"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div> -->
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Session Timeout (minutes)</label>
+          <input type="number" name="session_timeout" value="{{ session_timeout|default:30 }}"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <button type="submit"
+        class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

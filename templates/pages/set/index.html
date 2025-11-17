@@ -1,0 +1,113 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Software Engineering Dashboard</h1>
+    <p class="text-gray-600 dark:text-gray-400 text-sm">
+      Track your developers, repositories, commits, and ongoing software projects.
+    </p>
+  </div>
+  <a href="{% url 'dashboard' %}" 
+     class="text-sm bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-3 py-2 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition">
+    ← Back to Admin Dashboard
+  </a>
+</div>
+
+<!-- KPI Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+  <!-- Active Developers -->
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800 transition">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Active Developers</h3>
+    <div class="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-1">{{ active_developers }}</div>
+    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+{{ new_devs_this_month }} this month</p>
+  </div>
+
+  <!-- Ongoing Projects -->
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800 transition">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Ongoing Projects</h3>
+    <div class="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-1">{{ ongoing_projects }}</div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+      Last update: {{ last_project_update|date:"M j, Y" }}
+    </p>
+  </div>
+
+  <!-- Commits Today -->
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800 transition">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Commits (Today)</h3>
+    <div class="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-1">{{ commits_today }}</div>
+    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+{{ commits_growth }}% vs yesterday</p>
+  </div>
+
+  <!-- Open Issues -->
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800 transition">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Open Issues</h3>
+    <div class="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-1">{{ open_issues }}</div>
+    <p class="text-xs text-red-600 dark:text-red-400 mt-1">{{ critical_bugs }} critical bugs</p>
+  </div>
+</section>
+
+<!-- Project Summary Table -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6 mb-10 transition">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Active Software Projects</h2>
+    <a href="#" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View all projects</a>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
+        <tr>
+          <th class="py-2 pr-4 text-left">Project</th>
+          <th class="py-2 pr-4 text-left">Lead Developer</th>
+          <th class="py-2 pr-4 text-left">Progress</th>
+          <th class="py-2 text-left">Last Commit</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+        {% for project in projects %}
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+          <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">{{ project.name }}</td>
+          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ project.lead }}</td>
+          <td class="py-3 pr-4">
+            <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
+              <div class="bg-blue-600 dark:bg-blue-500 h-2 rounded-full" style="width: {{ project.progress }}%"></div>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 inline-block">{{ project.progress }}%</span>
+          </td>
+          <td class="py-3 text-gray-600 dark:text-gray-400">{{ project.last_commit|date:"M j, Y, H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center py-4 text-gray-500 dark:text-gray-400">No active projects found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Activity Log -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6 transition">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Activities</h2>
+    <a href="#" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View all logs</a>
+  </div>
+
+  <ul class="space-y-3 text-sm">
+    {% for activity in recent_activities %}
+    <li class="flex items-start gap-3">
+      <span class="h-2 w-2 mt-1.5 rounded-full 
+        {% if activity.type == 'commit' %}bg-blue-500{% elif activity.type == 'issue' %}bg-red-500{% else %}bg-green-500{% endif %}">
+      </span>
+      <div>
+        <p class="text-gray-700 dark:text-gray-300">{{ activity.message }}</p>
+        <span class="text-xs text-gray-500 dark:text-gray-400">{{ activity.timestamp|timesince }} ago</span>
+      </div>
+    </li>
+    {% empty %}
+    <li class="text-gray-500 dark:text-gray-400 text-sm">No recent activities found.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

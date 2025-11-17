@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign In | Software Engineering Team - II</title>
+
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { inter: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','Arial','sans-serif'] },
+            colors: {
+              brand: {
+                50:  '#eef9ff',
+                100: '#d9f0ff',
+                200: '#b6e3ff',
+                300: '#86d0ff',
+                400: '#4db7ff',
+                500: '#1f9bff',
+                600: '#0c7fe0',
+                700: '#0965b3',
+                800: '#0a4f8c',
+                900: '#0b426f',
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      html, body { height: 100%; }
+      body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100">
+    <div class="relative min-h-screen flex items-center justify-center p-6">
+      <!-- subtle background blobs -->
+      <div class="pointer-events-none absolute inset-0 overflow-hidden">
+        <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-brand-300/40 blur-3xl"></div>
+      </div>
+
+      <main class="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left panel -->
+        <section class="hidden lg:flex flex-col justify-center rounded-3xl bg-white/60 backdrop-blur-xl p-10 shadow-xl ring-1 ring-black/5">
+          <div class="mb-6 inline-flex items-center gap-3">
+            <div class="h-10 w-20 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold">SET - II</div>
+            <p class="text-sm font-medium text-brand-700">Software Engineering Team - II</p>
+          </div>
+
+          <h1 class="text-3xl font-extrabold text-gray-900">
+            Welcome back 👋
+          </h1>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            Please sign in with your email and password to continue.<br />
+            Don’t have an account yet? You can easily <span class="font-medium text-gray-900">create one below</span>.
+          </p>
+
+          <ul class="mt-6 space-y-3 text-gray-700">
+            <li class="flex items-start gap-3">
+              <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
+              <span>Secure login with modern encryption</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
+              <span>User-friendly interface with intuitive controls</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
+              <span>Fast performance and easy navigation</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Right panel (Form) -->
+        <section class="rounded-3xl bg-white/80 backdrop-blur-xl p-8 sm:p-10 shadow-2xl ring-1 ring-black/5">
+          <header class="mb-8">
+            <div class="flex items-center gap-3">
+              <div class="lg:hidden h-10 w-10 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold">SE</div>
+              <div>
+                <h2 class="text-2xl font-bold text-gray-900">Sign in</h2>
+                <p class="text-gray-600">Access your dashboard and manage your projects seamlessly.</p>
+              </div>
+            </div>
+          </header>
+
+          {% if messages %}
+            <div class="mb-4">
+              {% for message in messages %}
+                <p class="text-sm text-red-600 text-center font-medium">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <form action="{% url 'login' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+            <!-- Email -->
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-800">Email address</label>
+              <div class="mt-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="text"
+                  autocomplete="email"
+                  required
+                  placeholder="you@example.com"
+                  class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none ring-0 transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 placeholder:text-gray-400"
+                />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <div class="flex items-center justify-between">
+                <label for="password" class="block text-sm font-medium text-gray-800">Password</label>
+                <a href="#" class="text-sm font-medium text-brand-700 hover:text-brand-800">Forgot password?</a>
+              </div>
+              <div class="mt-2 relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+                  placeholder="••••••••"
+                  class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 pr-12 text-gray-900 shadow-sm outline-none ring-0 transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 placeholder:text-gray-400"
+                />
+                <button
+                  type="button"
+                  id="togglePassword"
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  aria-label="Show password"
+                >
+                  <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 5 12 5c4.64 0 8.577 2.51 9.964 6.678.07.22.07.464 0 .644C20.577 16.49 16.64 19 12 19c-4.64 0-8.577-2.51-9.964-6.678z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" class="size-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M3 3l18 18M10.584 10.59A3 3 0 0012 15a3 3 0 002.829-4.163M9.88 4.24A9.99 9.99 0 0112 4c4.64 0 8.577 2.51 9.964 6.678.07.22.07.464 0 .644-.538 1.678-1.52 3.147-2.77 4.315M6.228 6.23C4.62 7.42 3.39 9.06 2.036 11.678c-.07.22-.07.464 0 .644.89 2.78 2.84 4.95 5.19 6.17A9.97 9.97 0 0012 20c1.22 0 2.4-.2 3.504-.57" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember + Submit -->
+            <div class="flex items-center justify-between">
+              <label class="inline-flex items-center gap-2 select-none">
+                <input id="remember" name="remember" type="checkbox" class="size-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500" />
+                <span class="text-sm text-gray-700">Remember me</span>
+              </label>
+
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300 active:translate-y-px"
+              >
+                Sign in
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-xs text-gray-500 leading-relaxed">
+              By signing in, you agree to our
+              <a href="#" class="underline underline-offset-2 hover:text-gray-700">Terms</a> and
+              <a href="#" class="underline underline-offset-2 hover:text-gray-700">Privacy Policy</a>.
+            </p>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const btn = document.getElementById('togglePassword');
+      const input = document.getElementById('password');
+      const eyeOpen = document.getElementById('eyeOpen');
+      const eyeOff = document.getElementById('eyeOff');
+
+      btn?.addEventListener('click', () => {
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        eyeOpen.classList.toggle('hidden', !isHidden);
+        eyeOff.classList.toggle('hidden', isHidden);
+        btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      });
+    </script>
+  </body>
+</html>

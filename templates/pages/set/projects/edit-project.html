@@ -1,0 +1,159 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900 max-w-12xl mx-auto">
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'set.index' %}" class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17h12v-6.586l2.293-2.293-1.414-1.414z"/></svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707l3.293-3.293L7.293 8.12l1.414-1.414 4 4-4 4-1.414-1.414z" clip-rule="evenodd"/>
+          </svg>
+          <a href="{% url 'set.projects' %}" class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">Projects</a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707l3.293-3.293L7.293 8.12l1.414-1.414 4 4-4 4-1.414-1.414z" clip-rule="evenodd"/>
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 dark:text-slate-300">Edit Project</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">Edit Project</h2>
+
+  <form action="{% url 'set.edit-project' project.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- Project Title -->
+      <div class="sm:col-span-2">
+        <label for="title" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Project Title</label>
+        <input type="text" id="title" name="title" value="{{ project.title|default:'' }}" required
+          placeholder="e.g. Job Portal Development"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+
+      <!-- Team Lead -->
+      <div>
+        <label for="lead" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Team Lead</label>
+        <select id="lead" name="lead"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          <option value="">Select a team lead</option>
+          {% for member in members %}
+            <option value="{{ member.id }}" {% if member.id == project.team_lead.id %}selected{% endif %}>
+              {{ member.full_name }} ({{ member.get_position_display }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
+        <select id="status" name="status"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          {% for code, label in statuses %}
+            <option value="{{ code }}" {% if project.status == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Members -->
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+          Select Members
+        </label>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+          {% for u in members %}
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" name="members" value="{{ u.id }}"
+                class="rounded text-indigo-600 focus:ring-indigo-500"
+                {% if u in project.members.all %}checked{% endif %}>
+              <span class="text-sm text-slate-700 dark:text-slate-300">{{ u.full_name }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div>
+        <label for="start_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Start Date</label>
+        <input type="date" id="start_date" name="start_date" required
+          value="{{ project.start_date|date:'Y-m-d' }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+
+      <!-- Deadline -->
+      <div>
+        <label for="deadline" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Deadline</label>
+        <input type="date" id="deadline" name="deadline"
+          value="{{ project.deadline|date:'Y-m-d' }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+
+      <!-- Priority -->
+      <div>
+        <label for="priority" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</label>
+        <select id="priority" name="priority"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          {% for code, label in priorities %}
+            <option value="{{ code }}" {% if project.priority == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- File Upload -->
+      <div class="sm:col-span-1">
+        <label for="document" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Project Document (optional)
+        </label>
+        {% if project.project_document %}
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Current file:
+            
+            <a href="{{ project.project_document.url }}" class="text-indigo-600 hover:underline" target="_blank">
+              {{ project.project_document.name }}
+            </a>
+          </p>
+          {% endif %}
+          Replace with:
+        <input type="file" id="document" name="document" accept=".pdf,.docx,.doc,.txt"
+          class="mt-2 block w-full text-sm text-slate-600 dark:text-slate-300
+          file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+          file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
+          hover:file:bg-indigo-100 dark:file:bg-slate-800 dark:file:text-indigo-400">
+      </div>
+
+      <!-- Description -->
+      <div class="sm:col-span-2">
+        <label for="description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Description
+        </label>
+        <textarea id="description" name="description" rows="4" required
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900
+          px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">{{ project.description }}</textarea>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <a href="{% url 'set.projects' %}"
+        class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800">
+        Cancel
+      </a>
+      <button type="submit"
+        class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300">
+        Save Project
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

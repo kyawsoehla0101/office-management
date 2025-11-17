@@ -1,0 +1,84 @@
+{% load static %}
+{% load myanmar_nums %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spending Report</title>
+  <style>
+    @page {
+      margin: 10mm;
+      @top-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+    }
+    @bottom-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+
+    }
+    }
+    body { font-family: Pyidaungsu, sans-serif; font-size: 12px; }
+    h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background: #f2f2f2; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .date {
+            text-align: right;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    .header-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 3px; }
+  </style>
+</head>
+<body>
+  <div class="header-title">အာရက္ခတပ်တော်</div>
+  <div class="header-title">စစ် ရုံး ချုပ်</div>
+  <div class="header-title">ကွန်ပျူတာအဖွဲ့</div>
+  <h2>{% if month == 'all' %} ဌာနအသုံးစရိတ် {% else %} {{ month }} အတွက် ဌာနအသုံးစရိတ် {% endif %}</h2>
+  <p class="date"><b>နိစွဲ၊ </b>{{ current_date }}</p>
+
+  <table>
+    <thead>
+      <tr><th class="center">စဉ်</th><th class="center">ပစ္စည်းအမျိုးအမည်</th><th class="center">ပစ္စည်းအမျိုးအစား</th><th colspan="2" class="center">အရီအတွက်</th><th class="right">စျီးနှုန်း</th><th class="right">ကျသင့်ငွီ</th><th class="center">မှတ်ချက်</th></tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td class="center">{{ forloop.counter|mynum }}</td>
+        <td class="center">{{ r.item_name }}</td>
+        <td class="center">{{ r.category }}</td>
+        <td class="center">{{ r.unit }}</td>
+        <td class="center">{{ r.quantity|mynum }}</td>
+        <td class="right">{{ r.estimated_cost|floatformat:0|mynum }}</td>
+        <td class="right">{{ r.total_cost|floatformat:0|mynum }}</td>
+        <td class="center"></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h3 style="text-align:right; margin-top:10px;">စုစုပေါင်း -  {{ total_sum|floatformat:0|mynum }} ကျပ်</h3>
+  <div style="position: absolute;right: 0;bottom: 20px;">
+    <div style="font-size:14px;">
+        <div>
+            <img src="{{ request.build_absolute_uri|slice:':-1' }}static/img/ksh_sign.png"
+     style="width:100px; height:auto;">
+          </div>
+        <div>
+            ဗိုလ် သန္တာဖြူ 
+        </div>
+        <div>
+            ကွန်ပျူတာအဖွဲ့၊ စစ်ရုံးချုပ်
+        </div>
+        <div>
+            အာရက္ခတပ်တော်
+        </div>
+    </div>
+</body>
+</html>

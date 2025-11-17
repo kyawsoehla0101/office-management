@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="my" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tailwind + HTML Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    body {
+      /* font-family: 'Inter', sans-serif; */
+      font-family: 'Pyidaungsu',"Inter", sans-serif;
+
+    }
+  </style>
+  <script>
+    // Dark mode toggle using localStorage
+    (function () {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+            }
+          },
+          boxShadow: {
+            soft: '0 6px 24px -6px rgba(0,0,0,.08)'
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <style>
+    /* Hide scrollbar for sidebar on webkit */
+    .scroll-slim::-webkit-scrollbar {
+      width: 8px
+    }
+
+    .scroll-slim::-webkit-scrollbar-thumb {
+      background: #0002;
+      border-radius: 8px
+    }
+  </style>
+</head>
+
+<body class="h-full bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+  <div class="min-h-screen">
+    <!-- Topbar -->
+    {% include 'layouts/partials/header.html' %}
+
+    <div class="mx-auto grid max-w-12xl grid-cols-12 gap-4 px-4 py-6">
+      <!-- Sidebar -->
+      {% include 'layouts/partials/sidebar.html' %}
+
+      <!-- Main Content -->
+      <main class="col-span-12 md:col-span-9 lg:col-span-10">
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Sidebar toggle (simple hide/show on mobile)
+    const btnSidebar = document.getElementById('btnSidebar');
+    const sidebar = document.getElementById('sidebar');
+    function updateSidebar() {
+      if (window.innerWidth < 768) {
+        sidebar.classList.toggle('hidden');
+      }
+    }
+    btnSidebar.addEventListener('click', updateSidebar);
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) sidebar.classList.remove('hidden');
+    });
+
+    // Theme toggle
+    document.getElementById('btnTheme').addEventListener('click', () => {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+  </script>
+  
+  <!-- JavaScript for dropdown menus -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Profile dropdown in header
+      const profileBtn = document.getElementById('profileDropdownBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
+      
+      if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          profileDropdown.classList.toggle('hidden');
+        });
+      }
+      
+      // Action menu dropdowns in tables
+      const actionButtons = document.querySelectorAll('.action-menu-btn');
+      
+      actionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          
+          // Find the dropdown menu associated with this button
+          const dropdown = this.nextElementSibling;
+          
+          // Close all other dropdowns first
+          document.querySelectorAll('.action-menu').forEach(menu => {
+            if (menu !== dropdown) {
+              menu.classList.add('hidden');
+            }
+          });
+          
+          // Toggle the current dropdown
+          dropdown.classList.toggle('hidden');
+        });
+      });
+      
+      // Close all dropdowns when clicking outside
+      document.addEventListener('click', function() {
+        document.querySelectorAll('.action-menu, .profile-dropdown').forEach(menu => {
+          menu.classList.add('hidden');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

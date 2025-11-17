@@ -1,0 +1,124 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft max-w-12xl mx-auto">
+
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'het.requirements' %}"
+           class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17h12v-6.586l2.293-2.293-1.414-1.414z"/>
+          </svg>
+          Requirements
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"/>
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">Edit Requirement</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-6">Edit Hardware Requirement</h2>
+
+  <form method="post" action="{% url 'het.edit-requirement' requirement.id %}" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- Item Name -->
+      <div class="sm:col-span-2">
+        <label for="item_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Item Name</label>
+        <input type="text" id="item_name" name="item_name" value="{{ requirement.item_name }}" required
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label for="category" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
+        <select id="category" name="category" required
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none">
+          {% for value, label in categories %}
+          <option value="{{ value }}" {% if value == requirement.category %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Quantity -->
+      <div>
+        <label for="quantity" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Quantity</label>
+        <input type="number" id="quantity" name="quantity" value="{{ requirement.quantity }}" min="1" required
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-400 outline-none">
+      </div>
+
+      <!-- Estimated Cost -->
+      <div>
+        <label for="estimated_cost" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Estimated Cost (per unit)</label>
+        <input type="number" step="0.01" id="estimated_cost" name="estimated_cost" value="{{ requirement.estimated_cost|floatformat:2 }}" required
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-400 outline-none">
+      </div>
+
+      <!-- Month -->
+      <div>
+        <label for="month" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Month</label>
+        <select id="month" name="month"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none">
+          {% for value, name in months %}
+          <option value="{{ value }}" {% if value == requirement.month %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Year -->
+      <div>
+        <label for="year" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Year</label>
+        <select id="year" name="year"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none">
+          {% for y in years %}
+          <option value="{{ y }}" {% if y == requirement.year %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="sm:col-span-2">
+        <label for="description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+        <textarea id="description" name="description" rows="4"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-400 outline-none">{{ requirement.description }}</textarea>
+      </div>
+
+      <!-- Attachment -->
+      <div class="sm:col-span-2">
+        <label for="attachment" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Attachment (optional)</label>
+        {% if requirement.attachment %}
+          <p class="text-xs text-slate-500 mt-1">Current: 
+            <a href="{{ requirement.attachment.url }}" target="_blank" class="text-indigo-600 hover:underline">View File</a>
+          </p>
+        {% endif %}
+        <input type="file" id="attachment" name="attachment"
+          class="mt-2 block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-800 dark:file:text-indigo-400">
+      </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+      <a href="{% url 'het.requirements' %}"
+         class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800">
+        Cancel
+      </a>
+      <button type="submit"
+         class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300 transition">
+        Update Requirement
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

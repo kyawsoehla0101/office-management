@@ -1,0 +1,85 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 max-w-12xl mx-auto text-center">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'het.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-green-600 dark:text-slate-300 dark:hover:text-green-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17h12v-6.586l2.293-2.293-1.414-1.414z" />
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4-4 4-1.414-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          <a href="{% url 'het.repairs' %}"
+            class="ml-1 text-sm font-medium text-slate-700 hover:text-green-600 md:ml-2 dark:text-slate-300 dark:hover:text-green-400">
+            Repairs
+          </a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4-4 4-1.414-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
+            Delete Repair
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Header -->
+  <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-3">
+    Delete Repair Record
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6">
+    Are you sure you want to permanently delete this repair record?
+  </p>
+
+  <!-- Repair Summary -->
+  <div class="border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6 text-left">
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
+      <b>Ticket ID:</b> {{ repair.ticket_id }}
+    </p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
+      <b>Device Name:</b> {{ repair.device_name }}
+    </p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
+      <b>Status:</b> {{ repair.get_status_display }}
+    </p>
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      <b>Priority:</b> {{ repair.get_priority_display }}
+    </p>
+  </div>
+
+  <!-- Confirmation Form -->
+  <form method="post" action="{% url 'het.delete-repair' repair.id %}">
+    {% csrf_token %}
+    <div class="flex justify-center gap-4">
+      <a href="{% url 'het.repairs' %}" 
+         class="px-5 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-800">
+        Cancel
+      </a>
+      <button type="submit"
+              class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 shadow-sm">
+        Confirm Delete
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

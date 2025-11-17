@@ -1,0 +1,168 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<!-- Admin Header -->
+<div class="mb-8">
+  <div class="flex justify-between items-center flex-wrap gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        Welcome, {{ request.user.full_name }} 👋
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400 text-sm">
+        Today is {{ today|date:"l, F j, Y" }} — Quick overview of your teams and project health.
+      </p>
+    </div>
+    <div class="bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-2 text-sm text-blue-700 dark:text-blue-300">
+      Logged in as: <strong>{{ request.user.get_role_display }}</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Section: Department Cards -->
+<h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-100">Select a Department Dashboard</h2>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <!-- Software -->
+  <a href="{% url 'set.index' %}" 
+     class="group block rounded-2xl bg-blue-600 p-6 text-white hover:bg-blue-700 transition shadow-lg">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold mb-2">Software Engineering Team</h3>
+      <span class="bg-white/20 px-3 py-1 rounded-lg text-sm">{{ software_count }} active</span>
+    </div>
+    <p class="text-sm opacity-90 group-hover:opacity-100">
+      Manage developers, projects, commits and feature releases.
+    </p>
+    <div class="mt-4 text-xs text-blue-100">
+      Last updated: {{ software_last_updated|date:"M j, Y" }}
+    </div>
+  </a>
+
+  <!-- Hardware -->
+  <a href="{% url 'het.index' %}" 
+     class="group block rounded-2xl bg-green-600 p-6 text-white hover:bg-green-700 transition shadow-lg">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold mb-2">Hardware Engineering Team</h3>
+      <span class="bg-white/20 px-3 py-1 rounded-lg text-sm">{{ hardware_count }} active</span>
+    </div>
+    <p class="text-sm opacity-90 group-hover:opacity-100">
+      Oversee maintenance, embedded systems, and production metrics.
+    </p>
+    <div class="mt-4 text-xs text-green-100">
+      Last updated: {{ hardware_last_updated|date:"M j, Y" }}
+    </div>
+  </a>
+
+  <!-- Training -->
+  <a href="{% url 'training.index' %}" 
+     class="group block rounded-2xl bg-amber-500 p-6 text-white hover:bg-amber-600 transition shadow-lg">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold mb-2">Training & Learning</h3>
+      <span class="bg-white/20 px-3 py-1 rounded-lg text-sm">{{ training_count }} active</span>
+    </div>
+    <p class="text-sm opacity-90 group-hover:opacity-100">
+      Monitor student progress, ongoing courses, and certificates.
+    </p>
+    <div class="mt-4 text-xs text-amber-100">
+      Last updated: {{ training_last_updated|date:"M j, Y" }}
+    </div>
+  </a>
+</div>
+
+<!-- Section: Quick Stats -->
+<div class="mt-10 grid grid-cols-1 md:grid-cols-6 gap-6">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Departments</h3>
+    <div class="text-3xl font-extrabold text-blue-700 dark:text-blue-400">{{ total_departments|default:0 }}</div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Members</h3>
+    <div class="text-3xl font-extrabold text-green-700 dark:text-green-400">{{ total_members|default:0 }}</div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">SET Members</h3>
+    <div class="text-3xl font-extrabold text-yellow-600 dark:text-yellow-400">{{ total_set_members|default:30 }}</div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">HET Members</h3>
+    <div class="text-3xl font-extrabold text-purple-600 dark:text-purple-400">{{ total_het_members|default:0 }}</div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">Training Members</h3>
+    <div class="text-3xl font-extrabold text-amber-600 dark:text-amber-400">{{ total_training_members|default:0 }}</div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow text-center border border-gray-100 dark:border-gray-700">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Projects</h3>
+    <div class="text-3xl font-extrabold text-amber-600 dark:text-amber-400">{{ total_projects|default:0 }}</div>
+  </div>
+  
+</div>
+
+<!-- Section: Quick Overview -->
+<section class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <!-- System Notifications -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-100 dark:border-gray-700 p-6">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">System Notifications</h2>
+    <ul class="space-y-3 text-sm">
+      {% for note in notifications %}
+      <li class="flex items-start gap-3">
+        <span class="h-2 w-2 mt-1.5 rounded-full 
+          {% if note.level == 'info' %}bg-blue-500{% elif note.level == 'warning' %}bg-yellow-500{% else %}bg-red-500{% endif %}">
+        </span>
+        <div>
+          <p class="text-gray-700 dark:text-gray-300">{{ note.message }}</p>
+          <span class="text-xs text-gray-500 dark:text-gray-400">{{ note.timestamp|timesince }} ago</span>
+        </div>
+      </li>
+      {% empty %}
+      <li class="text-gray-500 dark:text-gray-400 text-sm">No new notifications.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Quick Team Overview -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-100 dark:border-gray-700 p-6">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Team Performance</h2>
+    <div class="space-y-4 text-sm">
+      <div>
+        <p class="text-gray-600 dark:text-gray-400">Software Team</p>
+        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+          <div class="bg-blue-600 h-2 rounded-full" style="width: {{ software_progress|default:80 }}%"></div>
+        </div>
+      </div>
+      <div>
+        <p class="text-gray-600 dark:text-gray-400">Hardware Team</p>
+        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+          <div class="bg-green-600 h-2 rounded-full" style="width: {{ hardware_progress|default:65 }}%"></div>
+        </div>
+      </div>
+      <div>
+        <p class="text-gray-600 dark:text-gray-400">Training Team</p>
+        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+          <div class="bg-amber-500 h-2 rounded-full" style="width: {{ training_progress|default:90 }}%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-100 dark:border-gray-700 p-6">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Recent Admin Actions</h2>
+    <ul class="space-y-3 text-sm">
+      {% for log in recent_actions %}
+      <li class="flex items-start gap-3">
+        <span class="h-2 w-2 mt-1.5 rounded-full 
+          {% if log.type == 'add' %}bg-green-500{% elif log.type == 'delete' %}bg-red-500{% else %}bg-blue-500{% endif %}">
+        </span>
+        <div>
+          <p class="text-gray-700 dark:text-gray-300">{{ log.message }}</p>
+          <span class="text-xs text-gray-500 dark:text-gray-400">{{ log.timestamp|timesince }} ago</span>
+        </div>
+      </li>
+      {% empty %}
+      <li class="text-gray-500 dark:text-gray-400 text-sm">No recent admin actions.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% endblock %}

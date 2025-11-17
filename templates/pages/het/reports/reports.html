@@ -1,0 +1,186 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900 max-w-12xl mx-auto">
+<!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'het.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+            </path>
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="#" class="ml-1 text-sm font-medium text-slate-700 hover:text-blue-600 md:ml-2 dark:text-slate-300 dark:hover:text-blue-400">
+            Reports
+          </a>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Repair Reports</h2>
+      <p class="text-slate-500 text-sm">All completed hardware repair records and downloadable reports.</p>
+    </div>
+
+    <!-- Export Buttons -->
+    <div class="flex gap-2">
+      <a href="{% url 'het.export-reports-csv' %}?{{ request.GET.urlencode }}"
+        class="flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+        </svg>
+        Export CSV
+      </a>
+
+      <a href="{% url 'het.export-reports-pdf' %}?month={{ request.GET.month|default:'all' }}&year={{ request.GET.year|default:'all' }}"
+        class="flex items-center gap-2 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 4v16m8-8H4" />
+        </svg>
+        Export PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <!-- <form method="get" class="flex flex-wrap grid grid-cols-9 gap-2 mb-5">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search device, ticket ID or technician..."
+      class="rounded-xl border border-slate-300 col-span-2 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+    <select name="status"
+      class="rounded-xl border border-slate-300 col-span-1 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm px-2 py-2 focus:ring-2 focus:ring-green-500">
+      <option value="">All Status</option>
+      {% for value,label in status_choices %}
+      <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit"
+      class="px-4 py-2 col-span-1 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm shadow-sm">
+      Filter
+    </button>
+  </form> -->
+  <form method="get" class="grid grid-cols-12 gap-2 mb-5">
+
+    <!-- Search -->
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search..."
+      class="col-span-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm">
+
+    <!-- Status -->
+    <select name="status"
+      class="col-span-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm px-2 py-2">
+      <option value="">All Status</option>
+      {% for value,label in status_choices %}
+      <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+        {{ label }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <!-- Month -->
+    <select name="month"
+      class="col-span-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm px-2 py-2">
+              <option value="all">All Months</option>
+
+         {% for num, name in months %}
+        <option value="{{ num }}" {% if selected_month == num|stringformat:"s" %}selected{% endif %}>
+            {{ name }}
+        </option>
+    {% endfor %}
+
+    </select>
+
+    <!-- Year -->
+    <select name="year"
+      class="col-span-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm px-2 py-2">
+              <option value="all" >All Years</option>
+
+        {% for y in years %}
+        <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>
+            {{ y }}
+        </option>
+    {% endfor %}
+
+    </select>
+
+    <button type="submit"
+      class="col-span-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm shadow-sm hover:bg-green-700">
+      Filter
+    </button>
+
+</form>
+
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+      <thead class="bg-slate-100 dark:bg-slate-800">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Ticket</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Device</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Technician</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Completed</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Created_At</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Report</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+        {% for r in repairs %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 font-medium">{{ r.ticket_id }}</td>
+          <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ r.device_name }}</td>
+          <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ r.technician.full_name|default:"-" }}</td>
+          <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ r.completed_date|default:"-" }}</td>
+          <td class="px-4 py-3 text-sm">
+            {% if r.status == 'completed' %}
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">Completed</span>
+            {% elif r.status == 'in_progress' %}
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">In Progress</span>
+            {% elif r.status == 'cancelled' %}
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200">Cancelled</span>
+            {% else %}
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200">Pending</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ r.created_at }}</td>
+          <td class="px-4 py-3 text-sm">
+            {% if r.report_document %}
+              <a href="{{ r.report_document.url }}" target="_blank"
+                class="text-green-600 hover:underline">View</a>
+            {% else %}
+              <span class="text-slate-400">No File</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <a href="{% url 'het.view-repair' r.id %}"
+              class="text-green-600 hover:text-green-800 font-medium text-sm">View Details</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">No repair reports found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

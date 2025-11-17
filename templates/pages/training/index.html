@@ -1,0 +1,109 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<!-- Header -->
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Training & Learning Dashboard
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 text-sm">
+      Monitor student progress, instructor performance, and ongoing courses.
+    </p>
+  </div>
+  <a href="{% url 'dashboard' %}"
+     class="text-sm bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-3 py-2 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-800/70 transition">
+    ← Back to Admin Dashboard
+  </a>
+</div>
+
+<!-- KPI Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Active Students</h3>
+    <div class="text-3xl font-bold text-amber-700 dark:text-amber-400 mt-1">{{ active_students }}</div>
+    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+{{ new_students_this_month }} joined this month</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Ongoing Courses</h3>
+    <div class="text-3xl font-bold text-amber-700 dark:text-amber-400 mt-1">{{ ongoing_courses }}</div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Updated {{ last_course_update|date:"M j, Y" }}</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Completed Certificates</h3>
+    <div class="text-3xl font-bold text-amber-700 dark:text-amber-400 mt-1">{{ certificates_issued }}</div>
+    <p class="text-xs text-amber-500 dark:text-amber-300 mt-1">+{{ new_certificates_today }} today</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Active Instructors</h3>
+    <div class="text-3xl font-bold text-amber-700 dark:text-amber-400 mt-1">{{ active_instructors }}</div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Teaching {{ courses_per_instructor }} avg courses</p>
+  </div>
+</section>
+
+<!-- Course Summary Table -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6 mb-10">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Top Performing Courses</h2>
+    <a href="#" class="text-sm text-amber-600 dark:text-amber-400 hover:underline">View all courses</a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
+        <tr>
+          <th class="py-2 pr-4 text-left">Course</th>
+          <th class="py-2 pr-4 text-left">Instructor</th>
+          <th class="py-2 pr-4 text-left">Students</th>
+          <th class="py-2 text-left">Completion Rate</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+        {% for course in top_courses %}
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+          <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">{{ course.name }}</td>
+          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ course.instructor }}</td>
+          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ course.students }}</td>
+          <td class="py-3">
+            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+              <div class="bg-amber-500 dark:bg-amber-400 h-2 rounded-full" style="width: {{ course.completion_rate }}%"></div>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 inline-block">{{ course.completion_rate }}%</span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center py-4 text-gray-500 dark:text-gray-400">No course data available.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Activity Log -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Training Activities</h2>
+    <a href="#" class="text-sm text-amber-600 dark:text-amber-400 hover:underline">View all logs</a>
+  </div>
+
+  <ul class="space-y-3 text-sm">
+    {% for act in recent_activities %}
+    <li class="flex items-start gap-3">
+      <span class="h-2 w-2 mt-1.5 rounded-full 
+        {% if act.type == 'enroll' %}bg-green-500{% elif act.type == 'complete' %}bg-amber-500{% else %}bg-blue-500{% endif %}">
+      </span>
+      <div>
+        <p class="text-gray-700 dark:text-gray-300">{{ act.message }}</p>
+        <span class="text-xs text-gray-500 dark:text-gray-400">{{ act.timestamp|timesince }} ago</span>
+      </div>
+    </li>
+    {% empty %}
+    <li class="text-gray-500 dark:text-gray-400 text-sm">No recent training activities found.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

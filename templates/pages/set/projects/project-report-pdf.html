@@ -1,0 +1,184 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+
+<style>
+    @page {
+        size: A4 landscape;
+        /* margin: 20mm; */
+        margin-top: 5mm;
+        margin-bottom: 5mm;
+        margin-left: 10mm;
+        margin-right: 10mm;
+        @top-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+    }
+    @bottom-center {
+      content: "-အတွင်းရီး-";
+      font-size: 12px;
+      font-family: 'Pyidaungsu';
+      text-align: center;
+
+    }
+
+    }
+
+    /* @font-face {
+        font-family: "Pyidaungsu";
+        src: url("file:///C:/Windows/Fonts/Pyidaungsu.ttf");
+    } */
+
+    body {
+        font-family: "Pyidaungsu", sans-serif;
+        font-size: 12px;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        color: #1e3a8a;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+
+    .date-box {
+        text-align: right;
+        margin-bottom: 15px;
+        font-size: 12px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 8px;
+        border: 1px solid #cbd5e1;
+    }
+
+    td {
+        padding: 6px;
+        border: 1px solid #cbd5e1;
+        text-align: center;
+    }
+
+    .summary-table {
+        width: 40%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .summary-table td, .summary-table th {
+        padding: 6px;
+        border: 1px solid #cbd5e1;
+    }
+
+    .summary-title {
+        background: #f1f5f9;
+        font-weight: bold;
+    }
+    
+    .center {
+        text-align: center;
+    }
+    
+    .right {
+        text-align: right;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="title">အာရက္ခတပ်တော်</div>
+<div class="title">စစ် ရုံး ချုပ်</div>
+<div class="title">ကွန်ပျူတာအဖွဲ့</div>
+<div class="subtitle">ပရောဂျက် အစီရင်ခံစာ</div>
+
+<div class="date-box">
+    နိန့်စွဲ၊  {{ current_date }}
+</div>
+
+<table>
+    <tr class="center">
+        <th>စဉ်</th>
+        <th>Project နာမေ</th>
+        <th>ဦးဆောင်လုပ်သောလူ</th>
+        <th>အဖွဲ့ဝင်များ</th>
+        <th>လုပ်ဆောင်မှု အခြီအနီ</th>
+        <th>ဦးစားပီးအဆင့်</th>
+        <th>စလုပ်သောနိ</th>
+        <th>သတ်မှတ်ရက်</th>
+        <th>မှတ်ချက်</th>
+    </tr>
+
+    {% for p in projects %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.title }}</td>
+        <td>{{ p.team_lead.full_name|default:"-" }}</td>
+        <td>{{ p.total_members }}</td>
+        <td>{{ p.get_status_display }}</td>
+        <td>{{ p.get_priority_display }}</td>
+        <td>{{ p.start_date }}</td>
+        <td>{{ p.deadline|default:"-" }}</td>
+        <td> </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br><br>
+
+<table class="summary-table">
+    <tr class="summary-title">
+        <td colspan="2">အနှစ်ချုပ်</td>
+    </tr>
+    <tr>
+        <td>Projects စုစုပေါင်း</td>
+        <td>{{ total_projects }}</td>
+    </tr>
+    <tr>
+        <td>ပြီးစီး</td>
+        <td>{{ completed_count }}</td>
+    </tr>
+    <tr>
+        <td>လုပ်နိန်ဆဲ</td>
+        <td>{{ ongoing_count }}</td>
+    </tr>
+    <tr>
+        <td>လျာထားမှု</td>
+        <td>{{ planning_count }}</td>
+    </tr>
+</table>
+<div class="right" style="position: absolute; bottom: 0;right: 0;">
+    <div>
+        <div>
+          နာမေ 
+        </div>
+        <div>
+          ကွန်ပျူတာအဖွဲ့၊ စစ်ရုံးချုပ်  
+        </div>
+        <div>
+          အာရက္ခတပ်တော် 
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+    <div class="p-10 text-center">
+  <h1 class="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+  <div>
+    <img src="https://img.icons8.com/color/48/000000/access-denied.png" alt="Access Denied" class="w-16 h-16 inline-block align-middle mr-2">
+    <span class="text-2xl font-bold text-red-600">403</span>
+    <span class="text-lg font-bold text-red-600">Forbidden</span>
+  </div>
+  <p class="text-gray-600">You do not have permission to view this page.</p>
+  <p class="text-gray-600">Please contact the administrator if you believe this is a mistake.</p>
+
+  <a href="{% url 'set.index' %}" class="mt-6 inline-block bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Go back</a>
+</div>
+
+{% endblock %}

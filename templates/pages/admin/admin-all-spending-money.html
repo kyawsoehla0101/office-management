@@ -1,0 +1,105 @@
+{% extends 'layouts/main.html' %}
+{% load myanmar_nums %}
+{% block content %}
+
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-soft">
+  <!-- Header + Filters -->
+  <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">{% if selected_dept == 'all' %}ဌာနအားလုံး{% else
+      %}{{ selected_dept|upper }}{% endif %}၏ အသုံးစရိတ်များ</h2>
+
+    <form method="get" class="flex flex-wrap gap-3 mt-4 sm:mt-0">
+      <!-- Department Filter -->
+      <select name="department"
+        class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        <option value="all" {% if selected_dept == 'all' %}selected{% endif %}>ဌာနအားလုံး</option>
+        <option value="set" {% if selected_dept  == 'set' %}selected{% endif %}>Software Engineering (SET)</option>
+        <option value="het" {% if selected_dept  == 'het' %}selected{% endif %}>Hardware Engineering (HET)</option>
+        <option value="training" {% if selected_dept == 'training' %}selected{% endif %}>Training School</option>
+      </select>
+
+      <!-- Month Filter -->
+      <select name="month"
+        class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        {% for m_value, m_name in months %}
+        <option value="{{ m_value }}" {% if m_value == selected_month %}selected{% endif %}>
+          {{ m_name }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <!-- Year Filter -->
+      <select name="year"
+        class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        {% for y in years %}
+        <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>{{ y|mynum }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- Submit Button -->
+      <button type="submit"
+        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm">
+        စစ်ပါ
+      </button>
+    </form>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="grid sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-indigo-50 dark:bg-indigo-900 p-4 rounded-xl text-center">
+      <h4 class="text-sm text-indigo-700 dark:text-indigo-300">စုစုပေါင်း အရီအတွက်</h4>
+      <p class="text-xl font-semibold text-indigo-900 dark:text-white">{{ total_items|mynum }}</p>
+    </div>
+
+    <div class="bg-green-50 dark:bg-green-900 p-4 rounded-xl text-center">
+      <h4 class="text-sm text-green-700 dark:text-green-300">စုစုပေါင်း ကုန်ကျစရိတ်</h4>
+      <p class="text-xl font-semibold text-green-900 dark:text-white">{{ total_cost|floatformat:2|mynum }} ကျပ်</p>
+    </div>
+
+    <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl text-center">
+      <h4 class="text-sm text-slate-700 dark:text-slate-300">လ နန့် နှစ်</h4>
+      <p class="text-lg font-semibold text-slate-900 dark:text-white">
+        {{ selected_month|mynum }} / {{ selected_year|mynum }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full border border-slate-200 dark:border-slate-700 rounded-xl">
+      <thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm uppercase">
+        <tr>
+          <th class="py-3 px-4 text-left">စဉ်</th>
+          <th class="py-3 px-4 text-left">ပစ္စည်းအမည်</th>
+          <th class="py-3 px-4 text-left">အမျိုးအစား</th>
+          <th class="py-3 px-4 text-center">အရီအတွက်</th>
+          <th class="py-3 px-4 text-right">စျီးနှုန်း (ကျပ်)</th>
+          <th class="py-3 px-4 text-right">စုစုပေါင်း ကုန်ကျစရိတ် (ကျပ်)</th>
+          <th class="py-3 px-4 text-center">ဌာန</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+        {% for r in spending_money %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          <td class="py-3 px-4">{{ forloop.counter|mynum }}</td>
+          <td class="py-3 px-4">{{ r.item_name }}</td>
+          <td class="py-3 px-4">{{ r.category }}</td>
+          <td class="py-3 px-4 text-center">{{ r.quantity|mynum }}</td>
+          <td class="py-3 px-4 text-right">{{ r.estimated_cost|floatformat:2|mynum }}</td>
+          <td class="py-3 px-6 text-right">{{ r.total_cost|floatformat:2|mynum }}</td>
+          <td class="py-3 px-4 text-center font-semibold uppercase">{{ r.department }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center py-6 text-slate-500 dark:text-slate-400">
+            အေစစ်ဆေးမှုအတွက် မရှိသိမ့်ပါ။
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,365 @@
+<aside id="sidebar" class="col-span-12 h-full md:col-span-3 lg:col-span-2">
+  <nav
+    class="scroll-slim sticky top-20 max-h-[calc(100vh-96px)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-soft space-y-6 dark:border-slate-800 dark:bg-slate-900">
+<!-- 🔹 ADMIN HOME -->
+    {% if request.user.role == 'admin' %}
+    <div>
+      <h2 class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 mb-2">
+        Administration
+      </h2>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'dashboard' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+                   {% if active_menu == 'admin_index' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 12l9-9 9 9M9 21V9h6v12" />
+            </svg>
+            ပင်မစာမျက်နှာ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'admin.users' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_users' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="7" r="4" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            အသုံးပြုသူများ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'admin.settings' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_settings' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M10.325 4.317a1 1 0 011.35 0l1.242 1.04a1 1 0 00.923.16l1.518-.505a1 1 0 011.18.586l.707 1.414a1 1 0 00.83.553l1.6.133a1 1 0 01.9.9l.133 1.6a1 1 0 00.553.83l1.414.707a1 1 0 01.586 1.18l-.505 1.518a1 1 0 00.16.923l1.04 1.242a1 1 0 010 1.35l-1.04 1.242a1 1 0 00-.16.923l.505 1.518a1 1 0 01-.586 1.18l-1.414.707a1 1 0 00-.553.83l-.133 1.6a1 1 0 01-.9.9l-1.6.133a1 1 0 00-.83.553l-.707 1.414a1 1 0 01-1.18.586l-1.518-.505a1 1 0 00-.923.16l-1.242 1.04a1 1 0 01-1.35 0l-1.242-1.04a1 1 0 00-.923-.16l-1.518.505a1 1 0 01-1.18-.586l-.707-1.414a1 1 0 00-.83-.553l-1.6-.133a1 1 0 01-.9-.9l-.133-1.6a1 1 0 00-.553-.83l-1.414-.707a1 1 0 01-.586-1.18l.505-1.518a1 1 0 00-.16-.923L2.11 15.933a1 1 0 010-1.35l1.04-1.242a1 1 0 00.16-.923l-.505-1.518a1 1 0 01.586-1.18l1.414-.707a1 1 0 00.553-.83l.133-1.6a1 1 0 01.9-.9l1.6-.133a1 1 0 00.83-.553l.707-1.414a1 1 0 011.18-.586l1.518.505a1 1 0 00.923-.16l1.242-1.04z" />
+            </svg>
+            ဆက်တင်များ
+          </a>
+        </li>
+        
+        <li>
+          <a href="{% url 'admin.all-spending-money' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_all_spending_money' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M12 12l-4 4m0 0l4 4m-4-4h12" />
+            </svg>
+            ဌာနအားလုံး၏ အသုံးစရိတ်
+          </a>
+        </li>
+        <li>
+          <li>
+          <a href="{% url 'admin.team-members' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_team_members' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M12 12l-4 4m0 0l4 4m-4-4h12" />
+            </svg>
+            တပ်ဖွဲ့ဝင်များ 
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'admin.spending-page' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_spending_page' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M12 12l-4 4m0 0l4 4m-4-4h12" />
+            </svg>
+            ရုံး (ဌာန) အသုံးစရိတ်
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'admin.spending-money-summary' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_spending_money_summary' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M12 12l-4 4m0 0l4 4m-4-4h12" />
+            </svg>
+            နှစ်အလိုက်အသုံးစရိတ်စုစုပေါင်း 
+          </a>
+        </li>
+        
+      </ul>
+    </div>
+    {% endif %}
+    <!-- SOFTWARE ENGINEERING TEAM -->
+    {% if request.user.role == 'admin' or request.user.role == 'set' %}
+      <div>
+      <h2 class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 mb-2">
+        Software Engineering Team
+      </h2>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'set.index' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+                   {% if active_menu == 'set_index' %}bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 12l9-9 9 9M9 21V9h6v12" />
+            </svg>
+            ပင်မစာမျက်နှာ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'set.projects' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'set_projects' %}bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 3h18v4H3zM3 13h18v8H3zM7 7v6M17 7v6" />
+            </svg>
+            ပရောဂျက်များ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'set.members' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'set_members' %}bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="7" r="4" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            တပ်ဖွဲ့ဝင်များ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'set.report' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'set_reports' %}bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9" />
+              <path d="M7 22h10a2 2 0 0 0 2-2v-5H5v5a2 2 0 0 0 2 2z" />
+            </svg>
+            အစီရင်ခံစာများ
+          </a>
+        </li>
+    <li>
+      <a href="{% url 'set.spending-page' %}"
+        class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+               {% if active_menu == 'set_spending_page' %}bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400{% else %}
+               text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M8 6h13M8 12h13m-7 6h7M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+        အသုံးစရိတ်များ
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'set.requirements-summary' %}"
+        class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+               {% if active_menu == 'set_requirements_summary' %}bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400{% else %}
+               text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        အသုံးစရိတ် အကျဉ်းချုပ်
+      </a>
+    </li>
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- HARDWARE ENGINEERING TEAM -->
+    {% if request.user.role == 'het' or request.user.role == 'admin' %}
+    <div>
+      <h2 class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 mb-2">
+        Hardware Engineering Team
+      </h2>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'het.index' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+                   {% if active_menu == 'het_index' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-green-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 12l9-9 9 9M9 21V9h6v12" />
+            </svg>
+            ပင်မစာမျက်နှာ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'het.repairs' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'het_repairs' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-green-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 3h18v4H3zM3 13h18v8H3zM7 7v6M17 7v6" />
+            </svg>
+            ပစ္စည်းများ
+          </a>
+        </li>
+        
+        <li>
+          <a href="{% url 'het.members' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'het_members' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-green-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="7" r="4" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            တပ်ဖွဲ့ဝင်များ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'het.reports' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'het_reports' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-green-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="7" r="4" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            အစီရင်ခံစာများ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'het.requirements' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'het_requirements' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M8 6h13M8 12h13m-7 6h7M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+            အသုံးစရိတ်များ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'het.requirements-summary' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'het_requirements_summary' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+            အသုံးစရိတ် အကျဉ်းချုပ်
+          </a>
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+    <!-- TRAINING SCHOOL -->
+     {% if request.user.role == 'training' or request.user.role == 'admin' %}
+    <div>
+      <h2 class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 mb-2">
+        Training & Learning
+      </h2>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'training.index' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium 
+                   {% if active_menu == 'training_index' %}bg-slate-100 text-amber-600 dark:bg-slate-800 dark:text-amber-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-amber-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 12l9-9 9 9M9 21V9h6v12" />
+            </svg>
+            ပင်မစာမျက်နှာ
+          </a>
+        </li>
+        <li>
+          <a href=""
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'training_courses' %}bg-slate-100 text-amber-600 dark:bg-slate-800 dark:text-amber-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-amber-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M3 3h18v4H3zM3 13h18v8H3zM7 7v6M17 7v6" />
+            </svg>
+            သင်တန်းများ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'training.students' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'training_members' %}bg-slate-100 text-amber-600 dark:bg-slate-800 dark:text-amber-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-amber-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="7" r="4" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            သင်တန်းသားများ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'training.requirements' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'training_requirements' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M8 6h13M8 12h13m-7 6h7M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+            အသုံးစရိတ်များ
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'training.requirements-summary' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'training_requirements_summary' %}bg-slate-100 text-green-600 dark:bg-slate-800 dark:text-green-400{% else %}
+                   text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+            အသုံးစရိတ် အကျဉ်းချုပ်
+          </a>
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+  </nav>
+</aside>

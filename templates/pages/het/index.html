@@ -1,0 +1,112 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<!-- Header -->
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Hardware Engineering Dashboard
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 text-sm">
+      Monitor your devices, maintenance schedules, and repair performance.
+    </p>
+  </div>
+  <a href="{% url 'dashboard' %}"
+     class="text-sm bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 px-3 py-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-800/70 transition">
+    ← Back to Admin Dashboard
+  </a>
+</div>
+
+<!-- KPI Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Active Machines</h3>
+    <div class="text-3xl font-bold text-green-700 dark:text-green-400 mt-1">{{ active_machines }}</div>
+    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+{{ new_devices_this_week }} new this week</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Under Maintenance</h3>
+    <div class="text-3xl font-bold text-green-700 dark:text-green-400 mt-1">{{ under_maintenance }}</div>
+    <p class="text-xs text-yellow-500 dark:text-yellow-400 mt-1">Scheduled this week</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">Repairs Completed</h3>
+    <div class="text-3xl font-bold text-green-700 dark:text-green-400 mt-1">{{ repairs_completed }}</div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Last update: {{ last_repair_update|date:"M j, Y" }}</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow border border-gray-100 dark:border-gray-800">
+    <h3 class="text-sm text-gray-500 dark:text-gray-400">System Uptime</h3>
+    <div class="text-3xl font-bold text-green-700 dark:text-green-400 mt-1">{{ system_uptime }}%</div>
+    <p class="text-xs text-green-500 dark:text-green-400 mt-1">Stable performance</p>
+  </div>
+</section>
+
+<!-- Maintenance Summary Table -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6 mb-10">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Maintenance Logs</h2>
+    <a href="#" class="text-sm text-green-600 dark:text-green-400 hover:underline">View all logs</a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
+        <tr>
+          <th class="py-2 pr-4 text-left">Device Name</th>
+          <th class="py-2 pr-4 text-left">Technician</th>
+          <th class="py-2 pr-4 text-left">Status</th>
+          <th class="py-2 text-left">Last Checked</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+        {% for log in maintenance_logs %}
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+          <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">{{ log.device_name }}</td>
+          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ log.technician }}</td>
+          <td class="py-3 pr-4">
+            <span class="px-3 py-1 rounded-full text-xs font-medium
+              {% if log.status == 'Completed' %} bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300
+              {% elif log.status == 'Pending' %} bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300
+              {% else %} bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 {% endif %}">
+              {{ log.status }}
+            </span>
+          </td>
+          <td class="py-3 text-gray-600 dark:text-gray-400">{{ log.last_checked|date:"M j, Y, H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center py-4 text-gray-500 dark:text-gray-400">No maintenance records available.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Activity Log -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Hardware Activities</h2>
+    <a href="#" class="text-sm text-green-600 dark:text-green-400 hover:underline">View all activities</a>
+  </div>
+
+  <ul class="space-y-3 text-sm">
+    {% for act in recent_activities %}
+    <li class="flex items-start gap-3">
+      <span class="h-2 w-2 mt-1.5 rounded-full 
+        {% if act.type == 'repair' %}bg-green-500{% elif act.type == 'issue' %}bg-red-500{% else %}bg-yellow-500{% endif %}"></span>
+      <div>
+        <p class="text-gray-700 dark:text-gray-300">{{ act.message }}</p>
+        <span class="text-xs text-gray-500 dark:text-gray-400">{{ act.timestamp|timesince }} ago</span>
+      </div>
+    </li>
+    {% empty %}
+    <li class="text-gray-500 dark:text-gray-400 text-sm">No recent activities found.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

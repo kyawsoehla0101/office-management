@@ -1,0 +1,136 @@
+{% extends 'layouts/main.html' %}
+{% block title %}အစီရင်ခံစာ အသစ်ထည့်ရန်{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'het.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-500">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+            </path>
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="{% url 'het.members' %}"
+            class="ml-1 text-sm font-medium text-slate-700 hover:text-brand-600 md:ml-2 dark:text-slate-300 dark:hover:text-brand-500">Members</a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="#"
+            class="ml-1 text-sm font-medium text-slate-700 hover:text-brand-600 md:ml-2 dark:text-slate-300 dark:hover:text-brand-500">Add New Report</a>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <div class="max-w-12xl mx-auto">
+    <div class="">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Add New Report</h1>
+      
+      <form method="post" action="" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- About -->
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">About</label>
+            <input type="text" name="title" id="title" required placeholder="Enter report title"
+              class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+          </div>
+          
+          <!-- Report Type -->
+          <div>
+            <label for="report_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Report Type</label>
+            <select name="report_type" id="report_type" required
+              class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+              <option value="">Choose</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="annual">Annual</option>
+              <option value="special">Special</option>
+            </select>
+          </div>
+          
+          <!-- Date -->
+          <div>
+            <label for="report_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+            <input type="date" name="report_date" id="report_date" required
+              class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+          </div>
+          
+          <!-- Responsible Person -->
+          <div>
+            <label for="responsible_person" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Responsible Person</label>
+            <input type="text" name="responsible_person" id="responsible_person" required placeholder="Enter responsible person"
+              class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+          </div>
+        </div>
+        
+        <!-- Summary -->
+        <div>
+          <label for="summary" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Summary</label>
+          <textarea name="summary" id="summary" rows="3" required placeholder="Enter summary"
+            class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white"></textarea>
+        </div>
+        
+        <!-- Details -->
+        <div>
+          <label for="details" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Details</label>
+          <textarea name="details" id="details" rows="6" required placeholder="Enter details"
+            class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white"></textarea>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Attachment -->
+        <div>
+          <label for="attachment" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Attachment</label>
+          <input type="file" name="attachment" id="attachment"
+            class="mt-1 block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-700 dark:file:text-slate-300">
+        </div>
+        
+        <!-- Status -->
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <select name="status" id="status" required
+            class="mt-1 block w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+            <option value="draft">Draft</option>  
+            <option value="submitted">Submitted</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <a href="{% url 'het.index' %}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
+            Cancel
+          </a>
+          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-800">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

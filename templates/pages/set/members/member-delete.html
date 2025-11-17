@@ -1,0 +1,102 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900 max-w-12xl mx-auto">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'set.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z" />
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <a href="{% url 'set.members' %}" class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
+            အဖွဲ့ဝင်များ
+          </a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
+            အဖွဲ့ဝင် ဖျက်ရန်
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Header -->
+  <div class="text-center">
+    <div class="mx-auto mb-4 w-16 h-16 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+      <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v2m0 4h.01M5.455 5.455L18.545 18.545M19 13a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">အဖွဲ့ဝင် ဖျက်ရန်</h2>
+    <p class="text-slate-500 dark:text-slate-400">
+      အဖွဲ့ဝင် ဖျက်ရန် သေချာပါဗျာယ်လား?
+      <span class="font-semibold text-slate-800 dark:text-slate-200">{{ member.full_name }}</span>?
+    </p>
+  </div>
+
+  <!-- Member Info Card -->
+  <div class="mt-6 bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 flex items-center gap-4 border border-slate-200 dark:border-slate-700">
+
+      <img src="{{ member.profile_photo.url }}" alt="Profile" class="h-40 w-40 rounded-full object-cover border border-slate-300 dark:border-slate-600">
+
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">{{ member.full_name }}</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400">{{ member.reg_no }} • {{ member.get_rank_display }}</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">{{ member.get_position_display }}</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">{{ member.get_department_display }}</p>
+      <div class="mt-4">
+        <p class="text-sm text-slate-500 dark:text-slate-400"><span class="font-semibold">စဝင်ရေနိ:</span> {{ member.joined_date }}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400"><span class="font-semibold">အကြောင်းအရာ:</span> {{ member.bio }}</p>
+      </div>
+
+      {% if member.is_active %}
+        <span class="mt-1 inline-block px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full dark:bg-green-800 dark:text-green-200">Active</span>
+      {% else %}
+        <span class="mt-1 inline-block px-3 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full dark:bg-red-800 dark:text-red-200">Inactive</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Confirm Delete Form -->
+  <form method="post" action="{% url 'set.delete-member' member.id %}" class="mt-8">
+    {% csrf_token %}
+    <p class="text-center text-slate-600 dark:text-slate-400 mb-6">
+      This action <span class="font-semibold text-red-600 dark:text-red-400">cannot be undone</span>.
+    </p>
+    <div class="flex items-center justify-center gap-4">
+      <a href="{% url 'set.members' %}"
+        class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800">
+        ပယ်ဖျက်ရန်
+      </a>
+      <button type="submit"
+        class="px-6 py-2.5 rounded-xl bg-red-600 text-white font-medium shadow-md hover:bg-red-700 focus:ring-2 focus:ring-red-300">
+        ဖျက်မည်
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
