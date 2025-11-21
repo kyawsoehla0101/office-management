@@ -89,17 +89,17 @@ class Member(models.Model):
 
 class Project(models.Model):
     STATUS_CHOICES = [
-        ("PLANNING", "Planning"),
-        ("ONGOING", "Ongoing"),
-        ("COMPLETED", "Completed"),
-        ("ONHOLD", "On Hold"),
-        ("CANCELLED", "Cancelled"),
+        ("PLANNING", "အစီအစိုင်ဆွဲနိန်"),
+        ("ONGOING", "လုပ်နိန်ဆဲ"),
+        ("COMPLETED", "ပြီးစီး"),
+        ("ONHOLD", "ရပ်တန့်"),
+        ("CANCELLED", "ပယ်ဖျက်"),
     ]
 
     PRIORITY_CHOICES = [
-        ("LOW", "Low"),
-        ("MEDIUM", "Medium"),
-        ("HIGH", "High"),
+        ("LOW", "နိမ့်"),
+        ("MEDIUM", "အလယ်အလတ်"),
+        ("HIGH", "မြင့်"),
     ]
 
     # Basic info

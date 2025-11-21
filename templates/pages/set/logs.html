@@ -1,0 +1,99 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<div class="max-w-12xl mx-auto p-6">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Activity Logs</h1>
+      <p class="text-gray-600 dark:text-gray-400 text-sm">
+        All system updates, project changes, commits, and developer activities.
+      </p>
+    </div>
+
+    <a href="{% url 'set.index' %}"
+       class="text-sm bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg
+              dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition">
+      ← Back
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" class="flex flex-wrap gap-3 mb-6">
+
+    <!-- Search -->
+    <input type="text" name="q" value="{{ request.GET.q }}"
+      placeholder="Search logs..."
+      class="flex-1 min-w-[200px] rounded-xl border border-gray-300 dark:border-gray-700
+             bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-gray-100
+             focus:ring-2 focus:ring-indigo-400 outline-none transition">
+
+    <!-- Type Filter -->
+    <select name="type"
+      class="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900
+             px-4 py-2 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 transition">
+      <option value="">All Types</option>
+      <option value="commit" {% if request.GET.type == "commit" %}selected{% endif %}>Commit</option>
+      <option value="issue" {% if request.GET.type == "issue" %}selected{% endif %}>Issue</option>
+      <option value="project" {% if request.GET.type == "project" %}selected{% endif %}>Project Update</option>
+      <option value="developer" {% if request.GET.type == "developer" %}selected{% endif %}>Developer Update</option>
+    </select>
+
+    <button class="px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition">
+      Filter
+    </button>
+  </form>
+
+  <!-- Logs Card -->
+  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-200 dark:border-gray-700 p-6">
+
+    {% if logs %}
+      <ul class="space-y-6">
+
+        {% for log in logs %}
+        <li class="flex items-start gap-4 p-4 rounded-xl
+                   bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+
+          <!-- Icon -->
+          <div>
+            {% if log.type == "commit" %}
+              <span class="text-blue-500 text-xl">💾</span>
+            {% elif log.type == "issue" %}
+              <span class="text-red-500 text-xl">🐞</span>
+            {% elif log.type == "project" %}
+              <span class="text-indigo-500 text-xl">📁</span>
+            {% else %}
+              <span class="text-green-500 text-xl">👤</span>
+            {% endif %}
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1">
+            <p class="text-gray-800 dark:text-gray-100 font-medium">
+              {{ log.message }}
+            </p>
+
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <span>{{ log.timestamp|timesince }} ago</span>
+              ·
+              <span>{{ log.timestamp|date:"M j, Y — H:i" }}</span>
+              {% if log.user %}
+                · <strong>{{ log.user.full_name }}</strong>
+              {% endif %}
+            </div>
+          </div>
+
+        </li>
+        {% endfor %}
+
+      </ul>
+
+    {% else %}
+      <p class="text-center text-gray-500 dark:text-gray-400 py-8">No activity logs found.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

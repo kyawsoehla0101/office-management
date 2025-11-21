@@ -12,7 +12,7 @@
             <path
               d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z" />
           </svg>
-          Dashboard
+          ပင်မစာမျက်နှာ
         </a>
       </li>
       <li>
@@ -24,7 +24,7 @@
           </svg>
           <a href="{% url 'set.projects' %}"
             class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
-            Projects
+            ပရောဂျက်များ
           </a>
         </div>
       </li>
@@ -36,7 +36,7 @@
               clip-rule="evenodd" />
           </svg>
           <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
-            Add Project
+            ပရောဂျက် အသစ် ဖန်တီးပါ
           </span>
         </div>
       </li>
@@ -45,8 +45,8 @@
 
   <!-- Header -->
   <div class="mb-6">
-    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Add New Project</h2>
-    <p class="text-slate-500 text-sm">Fill in the details below to create a new team project.</p>
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">ပရောဂျက်အသစ်ထည့်မည်</h2>
+    <p class="text-slate-500 text-sm">ပရောဂျက်အသစ်တစ်ခု ဖန်တီးဖို့အတွက် အောက်ပါ အကြောင်းအရာရို့ကို ဖြည့်ပါ။</p>
   </div>
 
   <!-- Project Form -->
@@ -55,14 +55,14 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <!-- Project Title -->
       <div class="sm:col-span-2">
-        <label for="title" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Project Title</label>
+        <label for="title" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ပရောဂျက်နာမေ</label>
         <input type="text" id="title" name="title" required placeholder="e.g. Job Portal Development"
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
       </div>
 
       <!-- Team Lead -->
       <div>
-        <label for="lead" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Team Lead</label>
+        <label for="lead" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ဦးဆောင်သူ</label>
         <select id="lead" name="lead" required
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
           {% for member in members %}
@@ -72,7 +72,7 @@
       </div>
       <!-- Status -->
       <div>
-        <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
+        <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300">အခြီအနီ</label>
         <select id="status" name="status" required
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
           {% for status in statuses %}
@@ -83,7 +83,7 @@
       <!-- Members -->
       <div class="sm:col-span-2">
         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-          Select Members
+          တပ်ဖွဲ့ဝင်များ ရွီးချယ်ပါ
         </label>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
           {% for u in members %}
@@ -99,20 +99,20 @@
 
       <!-- Start Date -->
       <div>
-        <label for="start_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Start Date</label>
+        <label for="start_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">စရေနိ</label>
         <input type="date" id="start_date" name="start_date" required
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
       </div>
 
       <!-- Deadline -->
       <div>
-        <label for="deadline" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Deadline</label>
+        <label for="deadline" class="block text-sm font-medium text-slate-700 dark:text-slate-300">သတ်မှတ်ပြီးစီးဖို့နိ</label>
         <input type="date" id="deadline" name="deadline"
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
       </div>
       <!-- Priority -->
       <div>
-        <label for="priority" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</label>
+        <label for="priority" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ဦးစားပီးမှု</label>
         <select id="priority" name="priority" required
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
           {% for priority in priorities %}
@@ -131,7 +131,7 @@
       <!-- Description -->
       <div class="sm:col-span-2">
         <label for="description"
-          class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300">အသေးစိတ် အကြောင်းအရာ</label>
         <textarea id="description" name="description" rows="4" required
           placeholder="Describe project objectives, scope, and goals..."
           class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"></textarea>
@@ -142,11 +142,11 @@
     <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
       <a href="{% url 'set.projects' %}"
         class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800">
-        Cancel
+        မထည့်ပါ
       </a>
       <button type="submit"
         class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300">
-        Save Project
+        သိမ်းဆည်းမည်
       </button>
     </div>
   </form>

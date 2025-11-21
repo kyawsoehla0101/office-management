@@ -1,4 +1,5 @@
 {% extends 'layouts/main.html' %}
+{% load myanmar_nums %}
 {% block content %}
 <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-soft max-w-12xl mx-auto">
 
@@ -6,13 +7,19 @@
   <nav class="flex mb-5" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
       <li class="inline-flex items-center">
-        <a href="{% url 'set.projects' %}"
+        <a href="{% url 'set.index' %}"
           class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path
               d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17h12v-6.586l2.293-2.293-1.414-1.414z" />
           </svg>
-          Projects
+          ပင်မစာမျက်နှာ
+        </a>
+      </li>
+      <li class="inline-flex items-center">
+        <a href="{% url 'set.projects' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          ပရောဂျက်များ
         </a>
       </li>
       <li>
@@ -40,7 +47,7 @@
 
   <!-- Progress Bar -->
   <div class="mb-8">
-    <p class="text-sm text-slate-600 dark:text-slate-400 font-medium">Progress: {{ project.progress|default:"0" }}%</p>
+    <p class="text-sm text-slate-600 dark:text-slate-400 font-medium">ပြီးစီးမှု: {{ project.progress|default:"0"|mynum }}%</p>
     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-2">
       <div class="h-3 rounded-full
         {% if project.progress >= 100 %}
@@ -58,35 +65,40 @@
   <!-- Project Info -->
   <div class="grid sm:grid-cols-2 gap-6 mb-8">
     <div>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Team Lead</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">ဦးဆောင်သူ</p>
       <p class="font-medium text-slate-800 dark:text-slate-200">{{ project.team_lead.full_name|default:"-" }}</p>
     </div>
     <div>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Start Date</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">စလုပ်ရေနိ</p>
       <p class="font-medium text-slate-800 dark:text-slate-200">{{ project.start_date }}</p>
     </div>
     <div>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Deadline</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">သတ်မှတ် ပြီးစီးဖို့နိ</p>
       <p class="font-medium text-slate-800 dark:text-slate-200">{{ project.deadline|default:"-" }}</p>
     </div>
     <div>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Total Members</p>
-      <p class="font-medium text-slate-800 dark:text-slate-200">{{ project.total_members }}</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">တပ်ဖွဲ့ဝင်များ</p>
+      <p class="font-medium text-slate-800 dark:text-slate-200">{% for m in project.members.all %}
+            
+            <span class="inline-block bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-2.5 py-1 rounded-full">{{ m.full_name }}{% if not forloop.last %} {% endif %}</span>
+            {% empty %}
+            <span class="text-slate-400 text-sm">No members</span>
+            {% endfor %}</p>
     </div>
   </div>
 
   <!-- Description -->
   <div class="mb-10">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Description</h3>
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">အသေးစိတ်အကြောင်းအရာ</h3>
     <p class="text-slate-700 dark:text-slate-300 leading-relaxed">{{ project.description }}</p>
   </div>
 
   <!-- Task List -->
   <div>
     <div class="flex justify-between items-center mb-3">
-      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Project Tasks</h3>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">လုပ်ဆောင်ရမည့် အလုပ်များ</h3>
       <a href=""
-         class="text-sm px-3 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">+ Add Task</a>
+         class="text-sm px-3 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">+ လုပ်ဆောင်မှုများ ထည့်ပါ</a>
     </div>
 
     {% if project.tasks.all %}
@@ -94,17 +106,17 @@
       <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
         <thead class="bg-slate-100 dark:bg-slate-800">
           <tr>
-            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Task</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Assigned To</th>
-            <th class="px-4 py-3 text-center text-sm font-medium text-slate-600 dark:text-slate-300">Status</th>
-            <th class="px-4 py-3 text-center text-sm font-medium text-slate-600 dark:text-slate-300">Due Date</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">လုပ်ဆောင်ရမည့် အလုပ်</th>
+            <!-- <th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Assigned To</th> -->
+            <th class="px-4 py-3 text-center text-sm font-medium text-slate-600 dark:text-slate-300">အခြီအနီ</th>
+            <th class="px-4 py-3 text-center text-sm font-medium text-slate-600 dark:text-slate-300">သတ်မှတ် ပြီးစီးဖို့နိ</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
           {% for task in project.tasks.all %}
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
             <td class="px-4 py-3 text-slate-800 dark:text-slate-200 font-medium">{{ task.title }}</td>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">{{ task.assigned_to.full_name|default:"—" }}</td>
+            <!-- <td class="px-4 py-3 text-slate-700 dark:text-slate-300">{{ task.assigned_to.full_name|default:"—" }}</td> -->
             <td class="px-4 py-3 text-center">
               {% if task.status == "DONE" %}
               <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">Completed</span>

@@ -25,6 +25,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from base.models import SystemSettings
 from base.utils import date_utils
 from .models import Project, SoftwareActivity
+from .activity import log_activity_dev
+from base.utils.date_utils import to_myanmar_date
 
 # SET Index View
 @role_required("set", "admin")
@@ -192,7 +194,7 @@ def addMember(request):
         # Auto assign department from user role
         department = request.user.role.upper()  # e.g. "set" → "SET"
 
-        Member.objects.create(
+        member = Member.objects.create(
             reg_no=reg_no,
             full_name=full_name,
             position=position,
@@ -205,6 +207,12 @@ def addMember(request):
             gender=gender,
             birth_date=birth_date,
         )
+        # 🔥 Activity Log
+        log_activity_dev(
+            message=f"👤 New member added — {member.full_name}",
+            event_type="developer",
+            user=request.user
+        )
         
         messages.success(request, f"Member '{full_name}' added to {department} team.")
         return redirect("set.members")
@@ -212,25 +220,163 @@ def addMember(request):
     return render(request, "pages/set/members/add-member.html", context)
 
 @role_required("set", "admin")
+# def editMember(request, id):
+#     system_name = SystemSettings.objects.first().system_name
+#     organization = SystemSettings.objects.first().organization  
+#     member = get_object_or_404(Member, id=id)
+#     if request.method == "POST":
+#         member.full_name = request.POST.get("full_name")
+#         member.reg_no = request.POST.get("reg_no")
+#         member.rank = request.POST.get("rank")
+#         member.position = request.POST.get("position")
+#         member.joined_date = request.POST.get("joined_date")
+#         member.bio = request.POST.get("bio")
+#         member.gender = request.POST.get("gender")
+#         member.birth_date = request.POST.get("birth_date")
+#         member.is_active = bool(request.POST.get("is_active"))
+
+#         if request.FILES.get("profile_photo"):
+#             member.profile_photo = request.FILES["profile_photo"]
+
+#         member.save()
+#         messages.success(request, f"Member '{member.full_name}' updated successfully!")
+#         return redirect("set.members")
+
+#     context = {
+#         "active_menu": "set_members",
+#         "system_name": system_name,
+#         "organization": organization,
+#         "member": member,
+#         "ranks": Member.RANK_CHOICES,
+#         "positions": Member.POSITION_CHOICES,
+#         "genders": Member.GENDER_CHOICES,
+#     }
+#     return render(request, "pages/set/members/edit-member.html", context)
+
+
 def editMember(request, id):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
     member = get_object_or_404(Member, id=id)
-    if request.method == "POST":
-        member.full_name = request.POST.get("full_name")
-        member.reg_no = request.POST.get("reg_no")
-        member.rank = request.POST.get("rank")
-        member.position = request.POST.get("position")
-        member.joined_date = request.POST.get("joined_date")
-        member.bio = request.POST.get("bio")
-        member.gender = request.POST.get("gender")
-        member.birth_date = request.POST.get("birth_date")
-        member.is_active = bool(request.POST.get("is_active"))
 
-        if request.FILES.get("profile_photo"):
-            member.profile_photo = request.FILES["profile_photo"]
+    # Store old values
+    old_name = member.full_name
+    old_reg = member.reg_no
+    old_rank = member.rank
+    old_position = member.position
+    old_gender = member.gender
+    old_birth = member.birth_date
+    old_joined = member.joined_date
+    old_active = member.is_active
+    old_bio = member.bio
+    old_photo = member.profile_photo
+
+    if request.method == "POST":
+
+        new_name = request.POST.get("full_name")
+        new_reg = request.POST.get("reg_no")
+        new_rank = request.POST.get("rank")
+        new_position = request.POST.get("position")
+        new_joined = request.POST.get("joined_date")
+        new_bio = request.POST.get("bio")
+        new_gender = request.POST.get("gender")
+        new_birth = request.POST.get("birth_date")
+        new_active = bool(request.POST.get("is_active"))
+        new_photo = request.FILES.get("profile_photo")
+
+        # Convert dates
+        try:
+            new_birth_date = datetime.strptime(new_birth, "%Y-%m-%d").date() if new_birth else None
+        except:
+            new_birth_date = member.birth_date
+
+        try:
+            new_joined_date = datetime.strptime(new_joined, "%Y-%m-%d").date() if new_joined else None
+        except:
+            new_joined_date = member.joined_date
+
+        # ============ LOG CHANGES ============
+        if new_name != old_name:
+            log_activity_dev(
+                f"📝 Member name changed: {old_name} → {new_name}",
+                "member",
+                request.user
+            )
+
+        if new_rank != old_rank:
+            log_activity_dev(
+                f"🎖 Rank updated: {old_rank} → {new_rank} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_position != old_position:
+            log_activity_dev(
+                f"👨‍💻 Position changed: {old_position} → {new_position} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_gender != old_gender:
+            log_activity_dev(
+                f"⚧ Gender changed: {old_gender} → {new_gender} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_birth_date != old_birth:
+            log_activity_dev(
+                f"🎂 Birthdate updated: {old_birth} → {new_birth_date} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_joined_date != old_joined:
+            log_activity_dev(
+                f"📅 Joined date changed: {old_joined} → {new_joined_date} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_active != old_active:
+            status = "Active" if new_active else "Inactive"
+            old_status = "Active" if old_active else "Inactive"
+            log_activity_dev(
+                f"🔄 Member status changed: {old_status} → {status} ({new_name})",
+                "member",
+                request.user
+            )
+
+        if new_bio != old_bio:
+            log_activity_dev(
+                f"🗒 Bio updated for {new_name}",
+                "member",
+                request.user
+            )
+
+        if new_photo:
+            log_activity_dev(
+                f"🖼 Profile photo updated for {new_name}",
+                "member",
+                request.user
+            )
+
+        # ============ SAVE NEW DATA ============
+        member.full_name = new_name
+        member.reg_no = new_reg
+        member.rank = new_rank
+        member.position = new_position
+        member.gender = new_gender
+        member.birth_date = new_birth_date
+        member.joined_date = new_joined_date
+        member.bio = new_bio
+        member.is_active = new_active
+
+        if new_photo:
+            member.profile_photo = new_photo
 
         member.save()
+
         messages.success(request, f"Member '{member.full_name}' updated successfully!")
         return redirect("set.members")
 
@@ -244,6 +390,7 @@ def editMember(request, id):
         "genders": Member.GENDER_CHOICES,
     }
     return render(request, "pages/set/members/edit-member.html", context)
+
 @role_required("set", "admin")
 def memberDetail(request, id):
     system_name = SystemSettings.objects.first().system_name
@@ -257,21 +404,38 @@ def memberDetail(request, id):
     }
     return render(request, 'pages/set/members/member-detail.html', context) 
 @role_required("set", "admin")
-def deleteMember(request,id):
+def deleteMember(request, id):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
     member = get_object_or_404(Member, id=id)
+
+    if request.method == "POST":
+        # Store before deletion for log
+        deleted_name = member.full_name
+        deleted_rank = member.rank
+        deleted_position = member.position
+
+        # Delete
+        member.delete()
+
+        # LOG ACTIVITY
+        log_activity_dev(
+            f"🗑 Member deleted: {deleted_name} (Rank: {deleted_rank}, Position: {deleted_position})",
+            "member",
+            request.user
+        )
+
+        messages.success(request, f"Member '{deleted_name}' deleted successfully.")
+        return redirect("set.members")
+
     context = {
         "active_menu": "set_members",
         "system_name": system_name,
         "organization": organization,
         "member": member,
     }
-    if request.method == "POST":
-        member.delete()
-        messages.success(request, f"Member '{member.full_name}' deleted successfully.")
-        return redirect('set.members')
-    return render(request, 'pages/set/members/member-delete.html', context)
+    return render(request, "pages/set/members/member-delete.html", context)
+
 
 @role_required("set", "admin")
 def requirements(request):
@@ -969,3 +1133,20 @@ def task_delete(request, tid):
     task.delete()
     messages.success(request, "Task deleted successfully!")
     return redirect("set.task-list", pid=pid, system_name=system_name, organization=organization)
+
+
+# views.py
+from .models import SoftwareActivity
+
+def activity_logs(request):
+    logs = SoftwareActivity.objects.all().order_by('-timestamp')
+
+    q = request.GET.get("q")
+    if q:
+        logs = logs.filter(message__icontains=q)
+
+    t = request.GET.get("type")
+    if t:
+        logs = logs.filter(type=t)
+
+    return render(request, "pages/set/logs.html", {"logs": logs})

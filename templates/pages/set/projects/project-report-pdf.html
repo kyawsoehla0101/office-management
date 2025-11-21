@@ -133,7 +133,12 @@
         <td>{{ forloop.counter }}</td>
         <td>{{ p.title }}</td>
         <td>{{ p.team_lead.full_name|default:"-" }}</td>
-        <td>{{ p.total_members }}</td>
+        <td>{% for m in p.members.all %}
+            
+            <span>{{ m.full_name }} {% if not forloop.last %} {% endif %}</span>
+            {% empty %}
+            <span class="text-slate-400 text-sm">No members</span>
+            {% endfor %}</td>
         <td>{{ p.get_status_display }}</td>
         <td>{{ p.get_priority_display }}</td>
         <td>{{ p.start_date }}</td>
