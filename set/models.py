@@ -3,6 +3,7 @@ from django.db import models
 import uuid
 from accounts.models import CustomUser   # link with your user table
 from base.models import BaseMonthlySpendingMoney
+from django.utils import timezone
 
 class Member(models.Model):
     GENDER_CHOICES = [
@@ -160,8 +161,17 @@ class Project(models.Model):
     def get_status_display(self):
         return dict([(value, key) for key, value in self.STATUS_CHOICES]).get(self.status, self.status.title())
 
+    @property
+    def progress(self):
+        total = self.tasks.count()
+        if total == 0:
+            return 0
+        done = self.tasks.filter(status="DONE").count()
+        return int((done / total) * 100)
+
 
 class Task(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     STATUS_CHOICES = [
         ("PENDING", "Pending"),
         ("IN_PROGRESS", "In Progress"),
@@ -217,3 +227,28 @@ class SoftwareSpendingMoney(BaseMonthlySpendingMoney):
         self._total_cost = value
     def __str__(self):
         return f"{self.item_name} ({self.get_month_display()} {self.year})"
+
+
+
+class SoftwareActivity(models.Model):
+    ACTIVITY_TYPES = [
+        ("commit", "Commit"),
+        ("issue", "Issue"),
+        ("project", "Project Update"),
+        ("developer", "Developer Update"),
+    ]
+
+    message = models.CharField(max_length=500)
+    type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="software_activities"
+    )
+
+    def __str__(self):
+        return f"{self.type}: {self.message[:30]}"

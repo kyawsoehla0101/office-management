@@ -1,0 +1,162 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<div class="max-w-12xl mx-auto p-6">
+<!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'set.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z" />
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <a href="{% url 'set.projects' %}"
+            class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
+            Projects
+          </a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
+            Edit
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Edit Task
+    </h2>
+
+    <a href="{% url 'set.task-list' task.project.id %}"
+       class="text-sm bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition">
+      ← Back
+    </a>
+  </div>
+
+  <!-- Card -->
+  <div class="bg-white dark:bg-gray-900 shadow border border-gray-200 dark:border-gray-700 rounded-2xl p-6 transition">
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Title -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Task Title
+        </label>
+        <input name="title" value="{{ task.title }}" required
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+          placeholder="Enter task title">
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Description
+        </label>
+        <textarea name="description" rows="4"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+          placeholder="Describe the task...">{{ task.description }}</textarea>
+      </div>
+
+      <!-- Assigned To -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Assigned To
+        </label>
+        <select name="assigned_to"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition">
+          <option value="">— Nobody —</option>
+          {% for m in members %}
+            <option value="{{ m.id }}" {% if task.assigned_to and task.assigned_to.id == m.id %}selected{% endif %}>
+              {{ m.full_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Status
+        </label>
+        <select name="status"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition">
+          
+          <option value="PENDING" {% if task.status == 'PENDING' %}selected{% endif %}>
+            Pending
+          </option>
+          <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>
+            In Progress
+          </option>
+          <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>
+            Completed
+          </option>
+        </select>
+      </div>
+
+      <!-- Dates -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        <!-- Start Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Start Date
+          </label>
+          <input type="date" name="start_date"
+            value="{{ task.start_date|date:'Y-m-d' }}"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition">
+        </div>
+
+        <!-- Due Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Due Date
+          </label>
+          <input type="date" name="due_date"
+            value="{{ task.due_date|date:'Y-m-d' }}"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-400 outline-none transition">
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+
+        <a href="{% url 'set.task-list' task.project.id %}"
+          class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          Cancel
+        </a>
+
+        <button type="submit"
+          class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300 transition">
+          Save Task
+        </button>
+
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

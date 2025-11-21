@@ -24,35 +24,61 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from base.models import SystemSettings
 from base.utils import date_utils
+from .models import Project, SoftwareActivity
 
 # SET Index View
 @role_required("set", "admin")
 def index(request):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
+
+     # KPIs
+    active_developers = Member.objects.filter(is_active=True).count()
+    new_devs_this_month = Member.objects.filter(created_at__month=timezone.now().month).count()
+
+    ongoing_projects = Project.objects.filter(status="active").count()
+    last_project_update = Project.objects.order_by("-updated_at").first()
+
+    commits_today = SoftwareActivity.objects.filter(
+        type="commit",
+        timestamp__date=timezone.now().date()
+    ).count()
+
+    commits_growth = 15  # Dummy (optional – later compute)
+
+    open_issues = SoftwareActivity.objects.filter(type="issue").count()
+    critical_bugs = SoftwareActivity.objects.filter(
+        type="issue",
+        message__icontains="critical"
+    ).count()
+
+    # Projects list
+    active_projects = Project.objects.all()
+
+    # Recent Activities (limit 10)
+    recent_activities = SoftwareActivity.objects.order_by("-timestamp")[:10]
+
     context = {
+        "active_developers": active_developers,
+        "new_devs_this_month": new_devs_this_month,
+
+        "ongoing_projects": ongoing_projects,
+        "last_project_update": last_project_update,
+
+        "commits_today": commits_today,
+        "commits_growth": commits_growth,
+
+        "open_issues": open_issues,
+        "critical_bugs": critical_bugs,
+
+        "active_projects": active_projects,
+        "recent_activities": recent_activities,
+
         "active_menu": "set_index",
-        "active_developers": 42,
-        "new_devs_this_month": 3,
-        "ongoing_projects": 9,
-        "commits_today": 158,
         "system_name": system_name,
         "organization": organization,
-        "commits_growth": 12,
-        "open_issues": 14,
-        "critical_bugs": 2,
-        "last_project_update": timezone.now() - timedelta(days=1),
-        "projects": [
-            {"name": "JobSeeker Portal", "lead": "Aung Kyaw", "progress": 85, "last_commit": timezone.now()},
-            {"name": "Quick Chat App", "lead": "May Thazin", "progress": 70, "last_commit": timezone.now() - timedelta(hours=2)},
-            {"name": "Resume Builder", "lead": "Min Htet", "progress": 95, "last_commit": timezone.now() - timedelta(hours=5)},
-        ],
-        "recent_activities": [
-            {"type": "commit", "message": "🚀 Deployed new version of Resume Builder", "timestamp": timezone.now() - timedelta(hours=1)},
-            {"type": "issue", "message": "❗ Fixed critical bug in authentication", "timestamp": timezone.now() - timedelta(hours=3)},
-            {"type": "merge", "message": "✅ Merged new chat module (Socket.io)", "timestamp": timezone.now() - timedelta(hours=5)},
-        ]
     }
+
     return render(request, 'pages/set/index.html', context)
 @login_required(login_url="login")
 @role_required("set", "admin")
@@ -453,11 +479,13 @@ def report(request):
 
     return render(request, "pages/set/reports/report.html", context)
 
+from .utils import log_activity
 @role_required("set", "admin")
+
 def addProject(request):
     members = Member.objects.all()
     statuses = Project.STATUS_CHOICES
-    priorities = Project.PRIORITY_CHOICES   
+    priorities = Project.PRIORITY_CHOICES
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
 
@@ -469,6 +497,7 @@ def addProject(request):
         "active_menu": "set_projects",
         "priorities": priorities,
     }
+
     if request.method == "POST":
         title = request.POST.get("title")
         desc = request.POST.get("description")
@@ -479,9 +508,9 @@ def addProject(request):
         team_lead_id = request.POST.get("lead")
         member_ids = request.POST.getlist("members")
         status = request.POST.get("status")
-        document = request.FILES.get("document")
 
-        project  = Project.objects.create(
+        # Create project
+        project = Project.objects.create(
             title=title,
             description=desc,
             created_by=request.user,
@@ -492,51 +521,242 @@ def addProject(request):
             deadline=deadline,
         )
 
-        # ✅ team_lead assign
+        # Log project creation
+        log_activity(
+            message=f"🆕 Project created: {project.title}",
+            activity_type="project",
+            user=request.user
+        )
+
+        # Team Lead assign
         if team_lead_id:
             try:
-                project.team_lead = Member.objects.get(id=team_lead_id)
+                lead = Member.objects.get(id=team_lead_id)
+                project.team_lead = lead
+                project.save()
+
+                log_activity(
+                    message=f"👨‍💻 {lead.full_name} assigned as Team Lead for '{project.title}'",
+                    activity_type="developer",
+                    user=request.user
+                )
             except Member.DoesNotExist:
                 pass
-            project.save()
 
-        # ✅ members assign (ManyToMany)
+        # Member Assign (ManyToMany)
         if member_ids:
             project.members.set(member_ids)
+
+            # Log each member
+            for mid in member_ids:
+                try:
+                    m = Member.objects.get(id=mid)
+                    log_activity(
+                        message=f"👥 Added member {m.full_name} to project '{project.title}'",
+                        activity_type="developer",
+                        user=request.user
+                    )
+                except:
+                    pass
+
         messages.success(request, "Project submitted successfully.")
         return redirect("set.projects")
+
     return render(request, 'pages/set/projects/add-project.html', context)
+
+# def addProject(request):
+#     members = Member.objects.all()
+#     statuses = Project.STATUS_CHOICES
+#     priorities = Project.PRIORITY_CHOICES   
+#     system_name = SystemSettings.objects.first().system_name
+#     organization = SystemSettings.objects.first().organization  
+
+#     context = {
+#         "system_name": system_name,
+#         "organization": organization,   
+#         "members": members,
+#         "statuses": statuses,   
+#         "active_menu": "set_projects",
+#         "priorities": priorities,
+#     }
+#     if request.method == "POST":
+#         title = request.POST.get("title")
+#         desc = request.POST.get("description")
+#         document = request.FILES.get("document")
+#         priority = request.POST.get("priority")
+#         start_date = request.POST.get("start_date")
+#         deadline = request.POST.get("deadline")
+#         team_lead_id = request.POST.get("lead")
+#         member_ids = request.POST.getlist("members")
+#         status = request.POST.get("status")
+#         document = request.FILES.get("document")
+
+#         project  = Project.objects.create(
+#             title=title,
+#             description=desc,
+#             created_by=request.user,
+#             status=status,
+#             project_document=document,
+#             priority=priority,
+#             start_date=start_date,
+#             deadline=deadline,
+#         )
+
+#         # ✅ team_lead assign
+#         if team_lead_id:
+#             try:
+#                 project.team_lead = Member.objects.get(id=team_lead_id)
+#             except Member.DoesNotExist:
+#                 pass
+#             project.save()
+
+#         # ✅ members assign (ManyToMany)
+#         if member_ids:
+#             project.members.set(member_ids)
+#         messages.success(request, "Project submitted successfully.")
+#         return redirect("set.projects")
+#     return render(request, 'pages/set/projects/add-project.html', context)
 
 @role_required("set", "admin")
 def editProject(request, id):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
-    context = {
-        "system_name": system_name,
-        "organization": organization,   
-        "active_menu": "set_projects",
-        "priorities": Project.PRIORITY_CHOICES,
-        "statuses": Project.STATUS_CHOICES,
-        "members": Member.objects.all(),
-    }
     project = get_object_or_404(Project, id=id)
+
+    # OLD values (for Activity Log)
+    old_title = project.title
+    old_desc = project.description
+    old_status = project.status
+    old_priority = project.priority
+    old_lead = project.team_lead
+    old_deadline = project.deadline
+    old_start = project.start_date
+    old_document = project.project_document
+    old_members = set(project.members.values_list('id', flat=True))
+    old_progress = project.progress  # ✅ Progress added
+
+    members = Member.objects.all()
+    statuses = Project.STATUS_CHOICES
+    priorities = Project.PRIORITY_CHOICES
+
     if request.method == "POST":
-        project.title = request.POST.get("title")
-        project.description = request.POST.get("description")
-        project.lead = request.POST.get("lead")
-        project.priority = request.POST.get("priority")
-        project.start_date = request.POST.get("start_date")
-        project.deadline = request.POST.get("deadline")
-        project.members.set(request.POST.getlist("members"))
-        project.status = request.POST.get("status")
-        project_document = request.FILES.get("document")
-        if project_document:
-            project.project_document = project_document
+        new_title = request.POST.get("title")
+        new_desc = request.POST.get("description")
+        new_status = request.POST.get("status")
+        new_priority = request.POST.get("priority")
+        new_start = request.POST.get("start_date")
+        new_deadline = request.POST.get("deadline")
+        new_lead_id = request.POST.get("lead")
+        new_member_ids = set(request.POST.getlist("members"))
+        new_document = request.FILES.get("document")
+
+        # --- UPDATE FIELDS ---
+        project.title = new_title
+        project.description = new_desc
+        project.status = new_status
+        project.priority = new_priority
+        project.start_date = new_start
+        project.deadline = new_deadline
+
+        # Document update
+        if new_document:
+            project.project_document = new_document
+            log_activity(
+                f"📄 Document updated for project '{old_title}'",
+                "project",
+                request.user
+            )
+
+        # Team Lead update
+        if new_lead_id:
+            new_lead = Member.objects.get(id=new_lead_id)
+            if old_lead != new_lead:
+                log_activity(
+                    f"👨‍💻 Team Lead changed: {old_lead.full_name if old_lead else 'None'} → {new_lead.full_name}",
+                    "developer",
+                    request.user
+                )
+            project.team_lead = new_lead
+
         project.save()
-        messages.success(request, f"Project '{project.title}' updated successfully.")
+
+        # --- MEMBERS UPDATED ---
+        if new_member_ids != old_members:
+            removed = old_members - new_member_ids
+            added = new_member_ids - old_members
+
+            for m_id in added:
+                member = Member.objects.get(id=m_id)
+                log_activity(
+                    f"➕ Member added: {member.full_name} to project '{new_title}'",
+                    "developer",
+                    request.user
+                )
+
+            for m_id in removed:
+                member = Member.objects.get(id=m_id)
+                log_activity(
+                    f"➖ Member removed: {member.full_name} from project '{new_title}'",
+                    "developer",
+                    request.user
+                )
+
+            project.members.set(new_member_ids)
+
+        # --- TITLE update ---
+        if new_title != old_title:
+            log_activity(
+                f"✏️ Project title changed: '{old_title}' → '{new_title}'",
+                "project",
+                request.user
+            )
+
+        # --- DESCRIPTION update ---
+        if new_desc != old_desc:
+            log_activity(
+                f"📝 Description updated for project '{new_title}'",
+                "project",
+                request.user
+            )
+
+        # --- PRIORITY update ---
+        if new_priority != old_priority:
+            log_activity(
+                f"⚡ Priority changed: {old_priority} → {new_priority} ({new_title})",
+                "project",
+                request.user
+            )
+
+        # --- STATUS update ---
+        if new_status != old_status:
+            log_activity(
+                f"🔄 Status changed: {old_status} → {new_status} ({new_title})",
+                "project",
+                request.user
+            )
+
+            # Completed
+            if new_status == "completed":
+                log_activity(
+                    f"🏁 Project Completed — '{new_title}'",
+                    "project",
+                    request.user
+                )        
+
+        messages.success(request, "Project updated successfully.")
         return redirect("set.projects")
-    context["project"] = project
+
+    context = {
+        "project": project,
+        "members": members,
+        "statuses": statuses,
+        "priorities": priorities,
+        "active_menu": "set_projects",
+        "system_name": system_name,
+        "organization": organization,
+    }
     return render(request, "pages/set/projects/edit-project.html", context)
+
 
 @role_required("set", "admin")
 def detailProject(request, id):
@@ -572,7 +792,6 @@ from weasyprint import HTML, CSS
 from datetime import datetime
 from django.utils import timezone
 from .models import Project
-from .utils.date_utils import to_myanmar_date
 def export_projects_pdf(request):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization  
@@ -661,3 +880,92 @@ def export_spending_pdf(request):
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="spending_{month}_{year}.pdf"'
     return response
+
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from set.models import Project, Task, Member
+from django.utils import timezone
+
+def task_list(request, pid):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    project = get_object_or_404(Project, id=pid)
+    tasks = project.tasks.all()
+    members = Member.objects.all()
+
+    return render(request, "pages/set/tasks/list.html", {
+        "system_name": system_name,
+        "organization": organization,   
+        "project": project,
+        "tasks": tasks,
+        "members": members,
+    })
+
+def task_add(request, pid):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    project = get_object_or_404(Project, id=pid)
+    members = Member.objects.all()
+
+    if request.method == "POST":
+        Task.objects.create(
+            project=project,
+            title=request.POST["title"],
+            description=request.POST.get("description"),
+            assigned_to_id=request.POST.get("assigned_to"),
+            status=request.POST.get("status"),
+            start_date=request.POST.get("start_date"),
+            due_date=request.POST.get("due_date"),
+        )
+        messages.success(request, "Task created successfully!")
+        return redirect("set.task-list", pid=project.id)
+
+    return render(request, "pages/set/tasks/add.html", {
+        "system_name": system_name,
+        "organization": organization,   
+        "project": project,
+        "members": members,
+    })
+
+
+def task_edit(request, tid):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    task = get_object_or_404(Task, id=tid)
+    members = Member.objects.all()
+
+    if request.method == "POST":
+        task.title = request.POST["title"]
+        task.description = request.POST.get("description")
+        task.assigned_to_id = request.POST.get("assigned_to")
+        task.status = request.POST.get("status")
+        task.start_date = request.POST.get("start_date")
+        task.due_date = request.POST.get("due_date")
+
+        if task.status == "DONE":
+            task.completed_at = timezone.now()
+
+        task.save()
+        messages.success(request, "Task updated successfully!")
+        return redirect("set.task-list", pid=task.project.id)
+
+    return render(request, "pages/set/tasks/edit.html", {
+        "system_name": system_name,
+        "organization": organization,   
+        "task": task,
+        "members": members,
+    })
+
+
+def task_delete(request, tid):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    task = get_object_or_404(Task, id=tid)
+    pid = task.project.id
+    task.delete()
+    messages.success(request, "Task deleted successfully!")
+    return redirect("set.task-list", pid=pid, system_name=system_name, organization=organization)

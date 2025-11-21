@@ -85,7 +85,7 @@
   <div class="header-title">ကွန်ပျူတာအဖွဲ့</div>
 
   <div class="sub-header" style="font-size:16px; margin-bottom:5px;">
-    {{ year }} ခုနှစ် အတွက် ဌာနဆိုင်ရာအလိုက် သုံးစွဲမှု ငွီစာရင်းအကျဉ်းချုပ်</div>
+    {{ year|mynum }} ခုနှစ် အတွက် ဌာနဆိုင်ရာအလိုက် သုံးစွဲမှု ငွီစာရင်းအကျဉ်းချုပ်</div>
     <p class="date"><b>နိစွဲ၊ </b>{{ current_date }}</p>
 
     <!-- MAIN MONTHLY TABLE -->
@@ -95,8 +95,8 @@
                 <th>လ</th>
                 <th class="text-right">SET</th>
                 <th class="text-right">HET</th>
-                <th class="text-right">TRAINING</th>
-                <th class="text-right">Office</th>
+                <th class="text-right">သင်တန်း</th>
+                <th class="text-right">ရုံး(ဌာန)</th>
                 <th class="text-right">စုစုပေါင်း</th>
             </tr>
         </thead>
@@ -120,15 +120,15 @@
 
     <table class="summary-table">
         <tr>
-            <th>SET Total</th>
+            <th>SET အတွက် စုစုပေါင်း သုံးစွဲငွီ</th>
             <td class="text-right">{{ total_set|floatformat:0|mynum }} ကျပ်</td>
         </tr>
         <tr>
-            <th>HET Total</th>
+            <th>HET အတွက် စုစုပေါင်း သုံးစွဲငွီ</th>
             <td class="text-right">{{ total_het|floatformat:0|mynum }} ကျပ်</td>
         </tr>
         <tr>
-            <th>TRAINING Total</th>
+            <th>သင်တန်းအတွက် စုစုပေါင်း သုံးစွဲငွီ</th>
             <td class="text-right">{{ total_training|floatformat:0|mynum }} ကျပ်</td>
         </tr>
 

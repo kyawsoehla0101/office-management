@@ -1,14 +1,31 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Project, Task
+from .models import Task
+from .activity import log_activity
 
-@receiver([post_save, post_delete], sender=Task)
-def update_project_progress(sender, instance, **kwargs):
+@receiver(post_save, sender=Task)
+def task_saved(sender, instance, created, **kwargs):
     project = instance.project
-    total = project.tasks.count()
-    if total == 0:
-        project.progress = 0
+
+    if created:
+        log_activity(
+            f"🆕 Task '{instance.title}' created in project '{project.title}'",
+            "task",
+            None
+        )
     else:
-        completed = project.tasks.filter(status="DONE").count()
-        project.progress = int((completed / total) * 100)
-    project.save()
+        if instance.status == "DONE":
+            log_activity(
+                f"✔ Task '{instance.title}' completed in project '{project.title}'",
+                "task",
+                None
+            )
+
+@receiver(post_delete, sender=Task)
+def task_deleted(sender, instance, **kwargs):
+    project = instance.project
+    log_activity(
+        f"❌ Task '{instance.title}' deleted from project '{project.title}'",
+        "task",
+        None
+    )

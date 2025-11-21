@@ -1,0 +1,146 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+<div class="max-w-12xl mx-auto p-6">
+<!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'set.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z" />
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <a href="{% url 'set.projects' %}"
+            class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
+            Projects
+          </a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
+            Task
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      {{ project.title }} — Tasks
+    </h2>
+
+    <a href="{% url 'set.task-add' project.id %}"
+       class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow transition">
+      + Add Task
+    </a>
+  </div>
+
+  <!-- Card Wrapper -->
+  <div class="bg-white dark:bg-gray-900 shadow border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden transition">
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold">Task</th>
+            <th class="px-4 py-3 text-left font-semibold">Assigned To</th>
+            <th class="px-4 py-3 text-center font-semibold">Status</th>
+            <th class="px-4 py-3 text-center font-semibold">Start</th>
+            <th class="px-4 py-3 text-center font-semibold">Due</th>
+            <th class="px-4 py-3 text-center font-semibold">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+
+          {% for t in tasks %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+
+            <!-- Title -->
+            <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+              {{ t.title }}
+            </td>
+
+            <!-- Assigned To -->
+            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+              {{ t.assigned_to.full_name|default:"-" }}
+            </td>
+
+            <!-- Status with badge -->
+            <td class="px-4 py-3 text-center">
+              {% if t.status == "PENDING" %}
+                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-200">
+                  Pending
+                </span>
+              {% elif t.status == "IN_PROGRESS" %}
+                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200">
+                  In Progress
+                </span>
+              {% else %}
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200">
+                  Completed
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Start date -->
+            <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+              {{ t.start_date|default:"—" }}
+            </td>
+
+            <!-- Due date -->
+            <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+              {{ t.due_date|default:"—" }}
+            </td>
+
+            <!-- Actions -->
+            <td class="px-4 py-3 text-center">
+              <a href="{% url 'set.task-edit' t.id %}"
+                 class="text-indigo-600 dark:text-indigo-400 hover:underline mx-1">
+                Edit
+              </a>
+              |
+              <a href="{% url 'set.task-delete' t.id %}"
+                 onclick="return confirm('Delete this task?')"
+                 class="text-red-600 dark:text-red-400 hover:underline mx-1">
+                Delete
+              </a>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-6 text-gray-500 dark:text-gray-400">
+              No tasks found. Start by adding one!
+            </td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

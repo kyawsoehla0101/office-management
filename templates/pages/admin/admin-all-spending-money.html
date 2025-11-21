@@ -5,8 +5,7 @@
 <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-soft">
   <!-- Header + Filters -->
   <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">{% if selected_dept == 'all' %}ဌာနအားလုံး{% else
-      %}{{ selected_dept|upper }}{% endif %}၏ အသုံးစရိတ်များ</h2>
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">{% if selected_dept == 'all' %}ဌာနအားလုံး{% else %} {{ selected_dept|upper }} {% endif %}၏ {{ selected_month|mynum }}/{{ selected_year|mynum }} အသုံးစရိတ်များ</h2>
 
     <form method="get" class="flex flex-wrap gap-3 mt-4 sm:mt-0">
       <!-- Department Filter -->

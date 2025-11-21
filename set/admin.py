@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Member, Project, SoftwareSpendingMoney, Task    
+from .models import Member, Project, SoftwareSpendingMoney, Task, SoftwareActivity
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ class ProjectAdmin(admin.ModelAdmin):
 
 admin.site.register(SoftwareSpendingMoney)
 admin.site.register(Task)
+admin.site.register(SoftwareActivity)

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-
 urlpatterns = [
     path('', views.index, name='set.index'),
     path('members/', views.members, name='set.members'),
@@ -28,4 +27,10 @@ urlpatterns = [
     path("spending/export/pdf/", views.export_spending_pdf, name="set.spending-export-pdf"),
     path("api/spending/", views.SpendingMoneyListCreateAPIView.as_view(), name="set.spending-list-api"),
     path("api/spending/<uuid:pk>/", views.SpendingMoneyDetailAPIView.as_view(), name="set.spending-detail-api"),
+
+
+    path("project/<uuid:pid>/tasks/", views.task_list, name="set.task-list"),
+    path("project/<uuid:pid>/tasks/add/", views.task_add, name="set.task-add"),
+    path("tasks/<uuid:tid>/edit/", views.task_edit, name="set.task-edit"),
+    path("tasks/<uuid:tid>/delete/", views.task_delete, name="set.task-delete"),
 ]
