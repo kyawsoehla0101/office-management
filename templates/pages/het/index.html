@@ -47,25 +47,25 @@
 <!-- Maintenance Summary Table -->
 <section class="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-6 mb-10">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Maintenance Logs</h2>
-    <a href="#" class="text-sm text-green-600 dark:text-green-400 hover:underline">View all logs</a>
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">ပြုပြင်ထိန်းသိမ်းမှု မှတ်တမ်းများ</h2>
+    <a href="#" class="text-sm text-green-600 dark:text-green-400 hover:underline">မှတ်တမ်းအားလုံးကို ကြည့်မည်</a>
   </div>
 
   <div class="overflow-x-auto">
     <table class="min-w-full text-sm">
       <thead class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
         <tr>
-          <th class="py-2 pr-4 text-left">Device Name</th>
-          <th class="py-2 pr-4 text-left">Technician</th>
-          <th class="py-2 pr-4 text-left">Status</th>
-          <th class="py-2 text-left">Last Checked</th>
+          <th class="py-2 pr-4 text-left">ပစ္စည်းအမျိုးအမည်</th>
+          <th class="py-2 pr-4 text-left">ပြုလုပ်သူ</th>
+          <th class="py-2 pr-4 text-left">အခြီအနီ</th>
+          <th class="py-2 text-left">နောက်ဆုံး ပြုပြင်ခရေနိ</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-        {% for log in maintenance_logs %}
+        {% for log in recent_repairs %}
         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
           <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">{{ log.device_name }}</td>
-          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ log.technician }}</td>
+          <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ log.technician.full_name }}</td>
           <td class="py-3 pr-4">
             <span class="px-3 py-1 rounded-full text-xs font-medium
               {% if log.status == 'Completed' %} bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300
@@ -74,7 +74,7 @@
               {{ log.status }}
             </span>
           </td>
-          <td class="py-3 text-gray-600 dark:text-gray-400">{{ log.last_checked|date:"M j, Y, H:i" }}</td>
+          <td class="py-3 text-gray-600 dark:text-gray-400">{{ log.updated_at|date:"M j, Y, H:i" }}</td>
         </tr>
         {% empty %}
         <tr>

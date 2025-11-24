@@ -97,23 +97,26 @@ AUTHENTICATION_BACKENDS = [
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'office',
-#         'USER': 'root',
-#         'PASSWORD': 'kyawsoehla0101',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'defaultdb',
+        'USER': 'doadmin',
+        'PASSWORD': 'AVNS_gwogUwAiAF0S5sawMEb',
+        'HOST': 'office-do-user-22229090-0.h.db.ondigitalocean.com',
+        'PORT': '25060',
+        'OPTIONS': {
+            'ssl_mode': 'REQUIRED',
+        },
+    }
+}
 
 
 # Password validation

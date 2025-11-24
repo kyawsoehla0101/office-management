@@ -1139,6 +1139,8 @@ def task_delete(request, tid):
 from .models import SoftwareActivity
 
 def activity_logs(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
     logs = SoftwareActivity.objects.all().order_by('-timestamp')
 
     q = request.GET.get("q")
@@ -1149,4 +1151,4 @@ def activity_logs(request):
     if t:
         logs = logs.filter(type=t)
 
-    return render(request, "pages/set/logs.html", {"logs": logs})
+    return render(request, "pages/set/logs.html", {"system_name": system_name, "organization": organization, "logs": logs, "active_menu":"set_activity_logs"})

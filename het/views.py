@@ -28,9 +28,11 @@ from base.utils import date_utils
 def dashboard(request):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
+    recent_repairs = HardwareRepair.objects.order_by('-updated_at')[:5]
     context = {
         "system_name": system_name,
         "organization": organization,
+        "recent_repairs": recent_repairs,
         "active_menu": "het_index",
         "active_machines": 23,
         "new_devices_this_week": 4,
