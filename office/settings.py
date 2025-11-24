@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-j-_(731ni2@p&=qo_0k@hh=*wmaep=%%(&05(0m&rwb7l+vy&-
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://office-management-cj00.onrender.com",
+]
 
 # Application definition
 
