@@ -8,7 +8,8 @@ urlpatterns = [
     path('edit-member/<uuid:id>/', views.editMember, name='het.edit-member'),
     path('member-detail/<uuid:id>/', views.memberDetail, name='het.member-detail'),
     path('delete-member/<uuid:id>/', views.deleteMember, name='het.delete-member'),
-
+    path('activities/', views.hardware_activities, name='het.activities'),
+    
     path('reports/', views.reports, name='het.reports'),
     path("reports/export/csv/", views.export_reports_csv, name="het.export-reports-csv"),
     path("reports/export/pdf/", views.export_reports_pdf, name="het.export-reports-pdf"),

@@ -26,6 +26,7 @@ from base.utils import date_utils
 # Dashboard View
 @role_required("het","admin")
 def dashboard(request):
+    recent_activities = HardwareActivity.objects.order_by('-timestamp')[:5]
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
     recent_repairs = HardwareRepair.objects.order_by('-updated_at')[:5]
@@ -45,11 +46,7 @@ def dashboard(request):
             {"device_name": "Laser Cutter", "technician": "Thazin Win", "status": "Pending", "last_checked": timezone.now() - timedelta(hours=5)},
             {"device_name": "Microcontroller Batch #12", "technician": "Myo Min", "status": "In Progress", "last_checked": timezone.now() - timedelta(hours=6)},
         ],
-        "recent_activities": [
-            {"type": "repair", "message": "✅ Power supply of CNC machine replaced successfully", "timestamp": timezone.now() - timedelta(hours=1)},
-            {"type": "issue", "message": "⚠️ Temperature sensor malfunction detected", "timestamp": timezone.now() - timedelta(hours=3)},
-            {"type": "repair", "message": "🛠️ 3D printer nozzle cleaned and recalibrated", "timestamp": timezone.now() - timedelta(hours=5)},
-        ],
+        "recent_activities": recent_activities,
     }
     return render(request, 'pages/het/index.html', context)
 
@@ -120,6 +117,12 @@ def addMember(request):
             gender=gender,
             birth_date=birth_date,
         )
+        HardwareActivity.objects.create(
+            message=f"Member '{full_name}' added to {department} team.",
+            type="member",
+            user=request.user,
+            timestamp=timezone.now()
+        )
         
         messages.success(request, f"Member '{full_name}' added to {department} team.")
         return redirect("het.members")
@@ -147,6 +150,12 @@ def editMember(request, id):
             member.profile_photo = request.FILES["profile_photo"]
 
         member.save()
+        HardwareActivity.objects.create(
+            message=f"Member '{member.full_name}' updated successfully!",
+            type="member",
+            user=request.user,
+            timestamp=timezone.now()
+        )
         messages.success(request, f"Member '{member.full_name}' updated successfully!")
         return redirect("het.members")
 
@@ -754,3 +763,15 @@ def export_spending_pdf(request):
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="spending_{month}_{year}.pdf"'
     return response
+
+from .models import HardwareActivity
+def hardware_activities(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    logs = HardwareActivity.objects.order_by("-timestamp")[:20]
+    return render(request, "pages/het/activities.html", {
+        "logs": logs,
+        "system_name": system_name,
+        "organization": organization,
+        "active_menu": "het_activities"
+    })

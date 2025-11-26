@@ -4,6 +4,7 @@ import uuid
 from accounts.models import CustomUser   # link with your user table
 from django.conf import settings
 from base.models import BaseMonthlySpendingMoney
+from django.utils import timezone
 class Member(models.Model):
     GENDER_CHOICES = [
         ('male', 'ကျား'),
@@ -209,3 +210,34 @@ class HardwareSpendingMoney(BaseMonthlySpendingMoney):
         self._total_cost = value
     def __str__(self):
         return f"{self.item_name} ({self.get_month_display()} {self.year})"
+
+
+
+class HardwareActivity(models.Model):
+    ACTIVITY_TYPES = [
+        ("repair", "Repair"),
+        ("maintenance", "Maintenance"),
+        ("install", "Installation"),
+        ("network", "Network Fix"),
+        ("power", "Electrical Work"),
+        ("other", "Other"),
+        ("issue", "Issue"),
+        ("sensor", "Sensor"),
+        ("controller", "Controller Board"),
+        ("member", "Member"),
+    ]
+
+    message = models.CharField(max_length=500)
+    type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="hardware_activities"
+    )
+
+    def __str__(self):
+        return f"{self.type}: {self.message}"
