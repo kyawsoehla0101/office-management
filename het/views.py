@@ -195,6 +195,20 @@ def deleteMember(request,id):
 
 
 def reports(request):
+    MYANMAR_MONTHS = [
+    "ဇန်နဝါရီလ",   # 01
+    "ဖေဖော်ဝါရီလ", # 02
+    "မတ်လ",         # 03
+    "ဧပြီလ",       # 04
+    "မေလ",          # 05
+    "ဂျုန်လ",         # 06
+    "ဂျူလိုင်လ",      # 07
+    "ဩဂတ်စ်လ",      # 08
+    "စပ်တမ်ဘာလ",    # 09
+    "အောက်တိုဘာလ",  # 10
+    "နိုဗမ်ဘာလ",     # 11
+    "ဒီဇင်ဘာလ",      # 12
+    ]
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
     q = request.GET.get("q", "")
@@ -210,8 +224,8 @@ def reports(request):
 
     # Month choices (1–12  + display name)
     import calendar
-    months = [(i, calendar.month_name[i]) for i in range(1, 13)]
-
+    months = [(i, MYANMAR_MONTHS[i-1]) for i in range(1, 13)]
+    # months = [("all", "လအားလုံး")] + [(str(i).zfill(2), MYANMAR_MONTHS[i-1]) for i in range(1, 13)]
     # Years (list around current year)
     years = [y for y in range(current_year - 3, current_year + 2)]
 
