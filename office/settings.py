@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://office-management-cj00.onrender.com",
+    "https://office.arakkha.tech",
 ]
 
 # Application definition

@@ -171,6 +171,7 @@ def editMember(request, id):
     return render(request, "pages/het/members/edit-member.html", context)
 
 # Member Detail View
+@login_required(login_url="login")
 @role_required("het", "admin")
 def memberDetail(request, id):
     system_name = SystemSettings.objects.first().system_name
@@ -185,11 +186,18 @@ def memberDetail(request, id):
     return render(request, 'pages/het/members/member-detail.html', context) 
 
 # Delete Member View
+@login_required(login_url="login")
 @role_required("het", "admin")   
 def deleteMember(request,id):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
     member = get_object_or_404(Member, id=id)
+    HardwareActivity.objects.create(
+            message=f"Member '{member.full_name}' deleted successfully.",
+            type="member",
+            user=request.user,
+            timestamp=timezone.now()
+        )
     context = {
         "system_name": system_name,
         "organization": organization,
@@ -202,7 +210,8 @@ def deleteMember(request,id):
         return redirect('het.members')
     return render(request, 'pages/het/members/member-delete.html', context)
 
-
+@login_required(login_url="login")
+@role_required("het", "admin")
 def reports(request):
     MYANMAR_MONTHS = [
     "ဇန်နဝါရီလ",   # 01
@@ -432,6 +441,12 @@ def addRepair(request):
             if request.FILES.get("report_document"):
                 repair.report_document = request.FILES["report_document"]
             repair.save()
+            HardwareActivity.objects.create(
+                message=f"Repair record added: {repair.ticket_id}",
+                type="repair",
+                user=request.user,
+                timestamp=timezone.now()
+            )
             messages.success(request, "Repair record added successfully!")
             # -----------------------------
             # 🔐 Generate PDF via WeasyPrint
@@ -492,6 +507,12 @@ def editRepair(request, id):
             repair.report_document = request.FILES["report_document"]
 
         repair.save()
+        HardwareActivity.objects.create(
+                message=f"Repair record updated: {repair.ticket_id}",
+                type="repair",
+                user=request.user,
+                timestamp=timezone.now()
+            )
         messages.success(request, "Repair updated successfully!")
         return redirect("het.repairs")
 
@@ -512,6 +533,12 @@ def deleteRepair(request, id):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
     repair = get_object_or_404(HardwareRepair, id=id)
+    HardwareActivity.objects.create(
+                message=f"Repair record deleted: {repair.ticket_id}",
+                type="repair",
+                user=request.user,
+                timestamp=timezone.now()
+            )
     context = {
         "system_name": system_name,
         "organization": organization,       
