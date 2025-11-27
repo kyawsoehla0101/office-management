@@ -1,0 +1,177 @@
+{% extends 'layouts/main.html' %}
+{% load static %}
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-soft dark:bg-slate-900">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="{% url 'training.index' %}"
+          class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l2.293-2.293a1 1 0 00-1.414-1.414l-7-7z">
+            </path>
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <a href="{% url 'training.members' %}" class="ml-1 text-sm font-medium text-slate-700 hover:text-indigo-600 md:ml-2 dark:text-slate-300 dark:hover:text-indigo-400">
+            အဖွဲ့ဝင်များ
+          </a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2 dark:text-slate-300">
+          ပြင်ရန်
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">ပြင်ရန်</h2>
+      <p class="text-slate-500 text-sm">{{ member.full_name }} အတွက် အကြောင်းအရာများအား ပြင်ဆင်ရန်</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form action="{% url 'training.edit-member' member.id %}" method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- Full Name -->
+      <div>
+        <label for="full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">နာမေ</label>
+        <input type="text" id="full_name" name="full_name" required
+          placeholder="နာမေ"
+          value="{{ member.full_name }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+
+      <!-- Registration Number -->
+      <div>
+        <label for="reg_no" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ကိုယ်ပိုင်အမှတ်</label>
+        <input type="text" id="reg_no" name="reg_no" required
+          placeholder="2023000000"
+          value="{{ member.reg_no }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+      <!-- Rank -->
+      <div>
+        <label for="rank" class="block text-sm font-medium text-slate-700 dark:text-slate-300">အဆင့်</label>
+        <select id="rank" name="rank"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          {% for rank in ranks %}
+            <option value="{{ rank.0 }}" {% if member.rank == rank.0 %}selected{% endif %}>{{ rank.1 }}</option>
+          {% endfor %}
+        </select> 
+      </div>
+
+      <!-- Role / Position -->
+      <div>
+        <label for="position" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ရာထူး/နီရာ</label>
+        <select id="position" name="position"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          {% for position in positions %}
+            <option value="{{ position.0 }}" {% if member.position == position.0 %}selected{% endif %}>{{ position.1 }}</option>
+          {% endfor %}
+        </select> 
+      </div>
+
+      <!-- Joined Date -->
+      <div>
+        <label for="joined_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">စဝင်ရေ နိ</label>
+        <input type="date" id="joined_date" name="joined_date" required
+          value="{{ member.joined_date|date:'Y-m-d' }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+      <!-- Gender -->
+      <div>
+        <label for="gender" class="block text-sm font-medium text-slate-700 dark:text-slate-300">လိင်</label>
+        <select id="gender" name="gender"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+          {% for gender in genders %}
+            <option value="{{ gender.0 }}" {% if member.gender == gender.0 %}selected{% endif %}>{{ gender.1 }}</option>
+          {% endfor %}
+        </select> 
+      </div>
+      <!-- Birth Date -->
+      <div>
+        <label for="birth_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">မွီးသက္ကရာဇ်</label>
+        <input type="date" id="birth_date" name="birth_date" required
+          value="{{ member.birth_date|date:'Y-m-d' }}"
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+      </div>
+      <!-- Bio -->
+      <div>
+        <label for="bio" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ကိုယ်ရီးအကျဉ်း</label>
+        <textarea id="bio" name="bio" rows="4"
+          placeholder="Write a short bio about {{ member.name }}."
+          class="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-slate-100 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">{{ member.bio }}</textarea>
+      </div>
+
+
+      <!-- Status -->
+      <div class="flex items-center gap-3 mt-6">
+        <input id="is_active" name="is_active" type="checkbox"
+          {% if member.is_active %}checked{% endif %}
+          class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+        <label for="is_active" class="text-sm font-medium text-slate-700 dark:text-slate-300">Active Member</label>
+      </div>
+
+      <!-- Profile Picture -->
+      <div>
+        <label for="photo" class="block text-sm font-medium text-slate-700 dark:text-slate-300">ပုံ</label>
+        {% if member.profile_photo %}
+  <p class="text-sm text-slate-500 dark:text-slate-400">
+    လက်ဟိပုံ: {{ member.profile_photo.url|cut:"/media/" }}
+  </p>
+{% else %}
+  <p class="text-sm text-slate-400 italic">
+    လက်ဟိပုံ မရှိပါ
+  </p>
+{% endif %}
+        <p class="text-sm text-slate-500 dark:text-slate-400">လက်ဟိပုံ အစားထိုးရန်:</p>
+      {% if member.profile_photo %}
+        <img src="{{ member.profile_photo.url }}" alt="{{ member.name }}" class="mt-2 w-16 h-16 rounded-full">
+        {% else %}
+        <p class="text-sm text-slate-400 italic">
+          <img src="{% static 'profile/default-profile.png' %}" alt="{{ member.name }}" class="mt-2 w-16 h-16 rounded-full">
+        </p>
+      {% endif %}
+
+        <input type="file" id="profile_photo" name="profile_photo" accept="image/*"
+          class="mt-2 block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-800 dark:file:text-indigo-400">
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <a href="{% url 'training.members' %}"
+        class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800">
+        ပယ်ဖျက်ရန်
+      </a>
+      <button type="submit"
+        class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300">
+        ပြင်ဆင်မည်
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
