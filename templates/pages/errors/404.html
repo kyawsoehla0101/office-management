@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="my" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page Not Found | 404</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    body {
+      /* font-family: 'Inter', sans-serif; */
+      font-family: 'Pyidaungsu',"Inter", sans-serif;
+
+    }
+  </style>
+  <script>
+    // Dark mode toggle using localStorage
+    (function () {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+            }
+          },
+          boxShadow: {
+            soft: '0 6px 24px -6px rgba(0,0,0,.08)'
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <style>
+    /* Hide scrollbar for sidebar on webkit */
+    .scroll-slim::-webkit-scrollbar {
+      width: 8px
+    }
+
+    .scroll-slim::-webkit-scrollbar-thumb {
+      background: #0002;
+      border-radius: 8px
+    }
+  </style>
+</head>
+
+<body class="h-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-6">
+    <div class="text-center max-w-lg">
+        <!-- Illustration -->
+        <!-- <img src="{% static 'img/404.svg' %}" class="mx-auto w-64 opacity-90 dark:opacity-80 mb-6" alt="404"> -->
+
+        <h1 class="text-5xl font-extrabold text-gray-800 dark:text-gray-200 mb-4">
+            404
+        </h1>
+
+        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            သင်ယှာရေ စာမျက်နှာစွာ မဟိသိမ့်ပါ။
+        </h2>
+
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+            သင်တောင်းဆိုသော URL သည် မဟိပါ။ ယှာဖို့မလွယ်ကူရေ လင့်ခ် ဖြစ်နိုင်ပါရေ။
+        </p>
+
+        <a href="/"
+           class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M15 19l-7-7 7-7"/>
+            </svg>
+            ပင်မစာမျက်နှာကို ပြန်လားပါ
+        </a>
+
+        <p class="mt-6 text-sm text-gray-400 dark:text-gray-500">
+            အေစာမျက်နှာစွာ အမှားအယွင်းတစ်ခုလို့ ထင်ကေ ဆက်သွယ်နိုင်ပါရေ။
+        </p>
+    </div>
+</body>
+
+</html>

@@ -112,5 +112,9 @@ class TrainingSpendingMoney(BaseMonthlySpendingMoney):
     @property
     def total_cost(self):
         return (self.quantity or 0) * (self.estimated_cost or 0)
+
+    @total_cost.setter
+    def total_cost(self, value):
+        self._total_cost = value
     def __str__(self):
         return f"{self.item_name} ({self.get_month_display()} {self.year})"

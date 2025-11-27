@@ -422,3 +422,7 @@ def all_team_members(request):
         "training_members": training_members,
         "active_menu": "admin_team_members",
     })
+
+
+def custom_404(request, exception):
+    return render(request, "pages/errors/404.html", status=404)

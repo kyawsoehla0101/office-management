@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -6,34 +7,81 @@ from accounts.utils.decorators import role_required
 from .models import CustomUser
 
 # Login view
+# def login_view(request):
+    # if request.method == "POST":
+    #     username_or_email = request.POST.get("email")
+    #     password = request.POST.get("password")
+
+    #     user = authenticate(request, username=username_or_email, password=password)
+        
+    #     if user is not None:
+    #         if user.is_active:
+    #             if user:
+    #                 login(request, user)
+    #                 return redirect("dashboard")
+    #             # Redirect by role
+    #             if user.is_superuser or user.is_staff:
+    #                 return redirect("/dashboard/")
+    #             elif user.role == "set":
+    #                 return redirect("set.index")
+    #             elif user.role == "het":
+    #                 return redirect("het.index")
+    #             elif user.role == "training":
+    #                 return redirect("training.index")
+    #             else:
+    #                 return redirect("access_denied")
+    #         else:
+    #             messages.error(request, "Your account is inactive.")
+    #     else:
+    #         messages.error(request, "Invalid username or password.")
+    # return render(request, "pages/login.html")
 def login_view(request):
+
+    # 🔥 1. Already logged-in user → Auto redirect by role
+    if request.user.is_authenticated:
+        user = request.user
+        if user.is_superuser or user.is_staff:
+            return redirect("/dashboard/")
+        elif user.role == "set":
+            return redirect("set.index")
+        elif user.role == "het":
+            return redirect("het.index")
+        elif user.role == "training":
+            return redirect("training.index")
+        else:
+            return redirect("access_denied")
+
+    # 🔥 2. Normal login POST
     if request.method == "POST":
         username_or_email = request.POST.get("email")
         password = request.POST.get("password")
 
         user = authenticate(request, username=username_or_email, password=password)
 
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-
-                # Redirect by role
-                if user.is_superuser or user.is_staff:
-                    return redirect("/dashboard/")
-                elif user.role == "set":
-                    return redirect("set.index")
-                elif user.role == "het":
-                    return redirect("het.index")
-                elif user.role == "training":
-                    return redirect("training.index")
-                else:
-                    return redirect("access_denied")
-            else:
+        if user:
+            if not user.is_active:
                 messages.error(request, "Your account is inactive.")
+                return render(request, "pages/login.html")
+
+            login(request, user)
+
+            # 🔥 3. Redirect based on role
+            if user.is_superuser or user.is_staff:
+                return redirect("/dashboard/")
+            elif user.role == "set":
+                return redirect("set.index")
+            elif user.role == "het":
+                return redirect("het.index")
+            elif user.role == "training":
+                return redirect("training.index")
+            else:
+                return redirect("access_denied")
+
         else:
             messages.error(request, "Invalid username or password.")
-    return render(request, "pages/login.html")
 
+    # 🔥 4. GET request → Show login page
+    return render(request, "pages/login.html")
 
 # Logout view
 @login_required(login_url="login")
