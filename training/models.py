@@ -105,6 +105,11 @@ class TrainingSpendingMoney(BaseMonthlySpendingMoney):
         related_name="training_approved_spending_money"
     )
     # ---------- Helper ----------
+    class Meta:
+        verbose_name = "Training Spending Money"
+        verbose_name_plural = "Training Spending Money"
+        ordering = ["year", "month"]
+    @property
     def total_cost(self):
         return (self.quantity or 0) * (self.estimated_cost or 0)
     def __str__(self):

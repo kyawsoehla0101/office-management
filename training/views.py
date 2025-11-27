@@ -9,6 +9,12 @@ from django.contrib import messages
 from base.models import SystemSettings
 from accounts.utils.decorators import role_required
 from .models import Member
+from base.utils import date_utils
+from base.utils.date_utils import to_myanmar_date
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+from datetime import datetime
+from django.http import HttpResponse
 @login_required 
 @role_required("admin", "training")
 def index(request):
@@ -519,3 +525,80 @@ def deleteRequirement(request, id):
         return redirect("training.requirements")
 
     return render(request, "pages/training/requirements/delete-requirement.html", {"requirement": requirement, "active_menu": "training_requirements","system_name":system_name,"organization": organization})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from rest_framework import generics, permissions
+from datetime import datetime
+from .serializers import TrainingSpendingMoneySerializer
+
+# Spending Money API View
+
+class SpendingMoneyListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = TrainingSpendingMoneySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = TrainingSpendingMoney.objects.all().order_by("-created_at")
+        month = self.request.GET.get("month")
+        year = self.request.GET.get("year")
+        if month and month != "all":
+            qs = qs.filter(month=month)
+        if year and year != "all":
+            qs = qs.filter(year=year)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+# Spending Money Detail API View
+
+class SpendingMoneyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TrainingSpendingMoney.objects.all()
+    serializer_class = TrainingSpendingMoneySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Spending Money Page View
+@login_required(login_url="/")
+@role_required("training", "admin")
+def spending_page(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization  
+    
+    months = TrainingSpendingMoney.MONTH_CHOICES
+    
+    years = range(2023, datetime.now().year + 6)
+    return render(request, "pages/training/spending-money/spending_page.html", {"months": months, "years": years, "system_name": system_name, "organization": organization, "active_menu": "training_spending_page"})
+
+# Spending Money PDF Export View
+@login_required(login_url="/")
+@role_required("training", "admin")
+def export_spending_pdf(request):
+    month = request.GET.get("month", "all")
+    year = request.GET.get("year", datetime.now().year)
+    qs = TrainingSpendingMoney.objects.all()
+    current_date = date_utils.to_myanmar_date_formatted(datetime.now())
+
+    if month != "all":
+        qs = qs.filter(month=month)
+    if year != "all":
+        qs = qs.filter(year=year)
+    total_sum = sum([r.total_cost for r in qs])
+    html = render_to_string("pages/training/spending-money/spending_pdf.html", {"records": qs, "total_sum": total_sum, "month": month, "year": year, "current_date": current_date})
+    pdf = HTML(string=html).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="training_spending_{month}_{year}.pdf"'
+    return response

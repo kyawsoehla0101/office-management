@@ -1,0 +1,319 @@
+
+{% extends "layouts/main.html" %}
+{% load myanmar_nums %}
+{% block content %}
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-lg max-w-12xl mx-auto transition-colors duration-300">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-3">
+    <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+      <span>Training အသုံးစရိတ်</span>
+    </h2>
+    <div class="flex flex-wrap gap-3 items-center">
+      <form id="filter-form" class="flex gap-2 items-center">
+        <select id="month" name="month"
+          class="border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none transition">
+          <option value="all">လအားလုံး</option>
+          {% for m,v in months %}
+            <option value="{{ m }}">{{ v }}</option>
+          {% endfor %}
+        </select>
+
+        <select id="year" name="year"
+          class="border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none transition">
+          <option value="all">နှစ်အားလုံး</option>
+          {% for y in years %}
+            <option value="{{ y }}">{{ y|mynum }}</option>
+          {% endfor %}
+        </select>
+
+        <button type="button" id="pdf-export"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg shadow transition duration-200 hover:shadow-md">
+          PDF ထုတ်ရန်
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Table -->
+  <form id="spending-form">{% csrf_token %}
+    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-inner transition">
+      <table class="min-w-full border-collapse">
+        <thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+          <tr>
+            <th class="p-2 text-center font-semibold">စဉ်</th>
+            <th class="p-2 text-left">ပစ္စည်းအမျိုးအမည်</th>
+            <th class="p-2 text-left">ပစ္စည်းအမျိုးအစား</th>
+            <th class="p-2 text-center" colspan="2">အရီအတွက်</th>
+            <!-- <th class="p-2 text-center">ယူနစ်</th> -->
+            <th class="p-2 text-right">စျီးနှုန်း</th>
+            <th class="p-2 text-center">ဌာန</th>
+            <th class="p-2 text-center">လ</th>
+            <th class="p-2 text-center">ခုနှစ်</th>
+            <th class="p-2 text-right">ကျသင့်ငွီ</th>
+            
+            <th class="p-2 text-center">လုပ်ဆောင်မှုများ</th>
+          </tr>
+        </thead>
+        <tbody id="spending-body" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900 transition-colors duration-300"></tbody>
+      </table>
+    </div>
+  </form>
+
+  <!-- Summary -->
+  <div id="summary-bar"
+    class="mt-4 text-right text-lg font-semibold text-slate-800 dark:text-slate-100 border-t border-slate-200 dark:border-slate-700 pt-3">
+    စုစုပေါင်း -  <span id="total-sum">0</span> ကျပ်
+  </div>
+</div>
+
+<script>
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+const body = document.getElementById("spending-body");
+const totalSumElem = document.getElementById("total-sum");
+const monthSel = document.getElementById("month");
+const yearSel = document.getElementById("year");
+
+// ✅ မြန်မာလ dictionary
+const myanmarMonths = {
+  "01": "ဇန်နဝါရီ", "02": "ဖေဖော်ဝါရီ", "03": "မတ်ချ်", "04": "ဧပြီ",
+  "05": "မေ", "06": "ဂျုန်", "07": "ဂျူလိုင်", "08": "သြဂတ်စ်",
+  "09": "စပ်တမ်ဘာ", "10": "အောက်တိုဘာ", "11": "နိုဗမ်ဘာ", "12": "ဒီဇင်ဘာ"
+};
+
+// ✅ ဂဏန်းပြောင်းဖို့
+function toMyanmarNumber(num) {
+  const map = { "0": "၀", "1": "၁", "2": "၂", "3": "၃", "4": "၄", "5": "၅", "6": "၆", "7": "၇", "8": "၈", "9": "၉" };
+  return String(num).split("").map(c => map[c] ?? c).join("");
+}
+
+// ✅ လပြောင်းဖို့
+function toMyanmarMonth(code) {
+  return myanmarMonths[code] || code;
+}
+
+// ✅ နှစ်ပြောင်း
+function toMyanmarYear(y) {
+  return toMyanmarNumber(y);
+}
+
+// Load records
+async function loadData() {
+  const m = monthSel.value;
+  const y = yearSel.value;
+  const res = await fetch(`{% url 'training.spending-list-api' %}?month=${m}&year=${y}`);
+  const data = await res.json();
+  body.innerHTML = "";
+
+  let total = 0;
+  data.forEach((r, i) => {
+    total += r.total_cost;
+    appendRow(r, i + 1);
+  });
+  totalSumElem.textContent = toMyanmarNumber(total.toLocaleString());
+  appendEmptyRow(data.length + 1);
+}
+
+// --- Add new row ---
+function appendEmptyRow(idx) {
+  const tr = document.createElement("tr");
+  tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition";
+
+  // ✅ လက်ရှိ လနှင့် နှစ်
+  const today = new Date();
+  const currentMonth = String(today.getMonth() + 1).padStart(2, "0");
+  const currentYear = today.getFullYear();
+
+  const departments = {
+
+    training: "Training",
+
+  };
+
+  const departmentOptions = Object.entries(departments)
+    .map(([val, label]) =>
+      `<option value="${val}" ${val === "training" ? "selected" : ""}>${label}</option>`
+    )
+    .join("");
+  // build month/year select options
+  const monthOptions = Object.entries(myanmarMonths)
+    .map(([k, v]) => `<option value="${k}" ${k === currentMonth ? "selected" : ""}>${v}</option>`)
+    .join("");
+  const yearOptions = Array.from({length: 5}, (_, i) => currentYear - 2 + i)
+    .map(y => `<option value="${y}" ${y === currentYear ? "selected" : ""}>${toMyanmarNumber(y)}</option>`)
+    .join("");
+
+  tr.innerHTML = `
+    <td class="p-2 text-center">${toMyanmarNumber(idx)}</td>
+    <td><input name="item_name" placeholder="ပစ္စည်းအမည်" class="w-full border dark:border-slate-700 rounded-lg px-2 py-1 dark:bg-slate-800 dark:text-slate-100" required></td>
+    <td><input name="category" placeholder="အမျိုးအစား" class="w-full border dark:border-slate-700 rounded-lg px-2 py-1 dark:bg-slate-800 dark:text-slate-100" required></td>
+    <td><input name="unit" value="ခု" class="border dark:border-slate-700 rounded-lg w-20 text-center dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="quantity" type="number" value="1" min="1" class="border dark:border-slate-700 rounded-lg w-20 text-center dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="estimated_cost" type="number" value="0" class="border dark:border-slate-700 rounded-lg w-28 text-right dark:bg-slate-800 dark:text-slate-100"></td>
+    <!-- ✅ Department -->
+    <td><select name="department" class="border dark:border-slate-700 rounded-lg px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${departmentOptions}</select></td>
+    <!-- ✅ Default month/year -->
+    <td><select name="month" class="border dark:border-slate-700 rounded-lg px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${monthOptions}</select></td>
+    <td><select name="year" class="border dark:border-slate-700 rounded-lg px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${yearOptions}</select></td>
+
+    <td class="text-right total-cell">၀</td>
+    <td class="text-center">
+      <button type="button" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg save-btn">သိမ်းမည်</button>
+    </td>`;
+
+  body.appendChild(tr);
+
+  // total calc
+  const qty = tr.querySelector('[name="quantity"]');
+  const cost = tr.querySelector('[name="estimated_cost"]');
+  const totalCell = tr.querySelector('.total-cell');
+  const recalc = () => totalCell.textContent = toMyanmarNumber((qty.value * cost.value).toLocaleString());
+  qty.addEventListener('input', recalc);
+  cost.addEventListener('input', recalc);
+
+  tr.querySelector('.save-btn').addEventListener('click', async () => {
+    const payload = {
+      department: tr.querySelector('[name="department"]').value,
+      item_name: tr.querySelector('[name="item_name"]').value,
+      category: tr.querySelector('[name="category"]').value,
+      quantity: parseInt(qty.value),
+      unit: tr.querySelector('[name="unit"]').value,
+      estimated_cost: parseFloat(cost.value),
+      month: tr.querySelector('[name="month"]').value,   // ✅ user-selected (default current month)
+      year: parseInt(tr.querySelector('[name="year"]').value), // ✅ user-selected (default current year)
+      description: ""
+    };
+    const res = await fetch("{% url 'training.spending-list-api' %}", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) loadData();
+    else alert(" သိမ်းမှု မအောင်မြင်ပါ။");
+  });
+}
+// Department label mapping (value ➜ label)
+const deptLabels = {
+  // office: "ရုံး",
+  training: "Training",
+  // het: "HET",
+  // training: "School"
+};
+// --- Display row ---
+function appendRow(r, idx) {
+  const tr = document.createElement("tr");
+  tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition";
+  //  label ပြမယ် — deptLabels ထဲက value ကိုဖမ်းမယ်
+  const deptLabel = deptLabels[r.department] || r.department; // fallback
+  tr.innerHTML = `
+    <td class="p-2 text-center">${toMyanmarNumber(idx)}</td>
+    <td class="p-2 text-sm">${r.item_name}</td>
+    <td class="p-2 text-sm">${r.category}</td>
+    <td class="p-2 text-center text-sm">${r.unit}</td>
+    <td class="p-2 text-center text-sm">${toMyanmarNumber(r.quantity)}</td>
+    <td class="p-2 text-right text-sm">${toMyanmarNumber(r.estimated_cost)}</td>
+    <!-- ✅ Department -->
+    <td class="p-2 text-center text-sm">${deptLabel}</td>
+    <td class="p-2 text-center text-sm">${toMyanmarMonth(r.month)}</td>
+    <td class="p-2 text-center text-sm">${toMyanmarNumber(r.year)}</td>
+    <td class="p-2 text-right font-medium text-sm">${toMyanmarNumber(r.total_cost)}</td>  
+    <td class="p-2 text-center text-sm space-x-2">
+      <button class="text-blue-600 dark:text-blue-400 hover:underline edit-btn">ပြင်မည်</button>
+      <button class="text-red-600 dark:text-red-400 hover:underline delete-btn">ဖျက်မည်</button>
+    </td>`;
+  // ✅ Department ကို training အဖြစ် ပြောင်းပါ
+  tr.querySelector(".delete-btn").addEventListener("click", async () => {
+    if (confirm(" ဖျက်ဖို့သေချာပါသလား?")) {
+      await fetch(`{% url 'training.spending-list-api' %}${r.id}/`, { 
+        method: "DELETE", headers: { "X-CSRFToken": csrfToken }
+      });
+      loadData();
+    }
+  });
+
+  tr.querySelector(".edit-btn").addEventListener("click", () => toEditMode(tr, r, idx));
+  body.appendChild(tr);
+}
+
+// --- Edit Mode ---
+function toEditMode(tr, r, idx) {
+  const monthOptions = Object.entries(myanmarMonths)
+    .map(([k, v]) => `<option value="${k}" ${r.month === k ? "selected" : ""}>${v}</option>`)
+    .join("");
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({length: 5}, (_, i) => currentYear - 2 + i)
+    .map(y => `<option value="${y}" ${r.year == y ? "selected" : ""}>${toMyanmarNumber(y)}</option>`)
+    .join("");
+
+  const departments = {
+    // office: "ရုံး",
+    training: "Training",
+    // het: "HET",
+    // training: "School"
+  };
+  const departmentOptions = Object.entries(departments)
+    .map(([val, label]) =>
+      `<option value="${val}" ${r.department === val ? "selected" : ""}>${label}</option>`
+    )
+    .join("");
+
+  tr.innerHTML = `
+    <td class="p-2 text-center">${toMyanmarNumber(idx)}</td>
+    <td><input name="item_name" value="${r.item_name}" class="border rounded px-2 py-1 w-full dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="category" value="${r.category}" class="border rounded px-2 py-1 w-full dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="quantity" type="number" value="${r.quantity}" class="border rounded w-20 text-center dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="unit" value="${r.unit}" class="border rounded w-20 text-center dark:bg-slate-800 dark:text-slate-100"></td>
+    <td><input name="estimated_cost" type="number" value="${r.estimated_cost}" class="border rounded w-28 text-right dark:bg-slate-800 dark:text-slate-100"></td>
+        <td><select name="department" class="border rounded px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${departmentOptions}</select></td>
+
+    <td><select name="month" class="border rounded px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${monthOptions}</select></td>
+    <td><select name="year" class="border rounded px-2 py-1 dark:bg-slate-800 dark:text-slate-100">${yearOptions}</select></td>
+    <td class="text-right total-cell">${toMyanmarNumber(r.total_cost)}</td>
+
+    <td class="text-center">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded update-btn">ပြုပြင်မည်</button>
+      <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded cancel-btn">မပြုပြင်ပါ</button>
+    </td>`;
+
+  const qty = tr.querySelector('[name="quantity"]');
+  const cost = tr.querySelector('[name="estimated_cost"]');
+  const totalCell = tr.querySelector('.total-cell');
+  const recalc = () => totalCell.textContent = toMyanmarNumber((qty.value * cost.value).toLocaleString());
+  qty.addEventListener('input', recalc);
+  cost.addEventListener('input', recalc);
+
+  tr.querySelector(".update-btn").addEventListener("click", async () => {
+    const payload = {
+      department: tr.querySelector('[name="department"]').value,
+      month: tr.querySelector('[name="month"]').value,
+      year: parseInt(tr.querySelector('[name="year"]').value),
+      item_name: tr.querySelector('[name="item_name"]').value,
+      category: tr.querySelector('[name="category"]').value,
+      quantity: parseInt(qty.value),
+      unit: tr.querySelector('[name="unit"]').value,
+      estimated_cost: parseFloat(cost.value)
+    };
+    await fetch(`{% url 'training.spending-list-api' %}${r.id}/`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+      body: JSON.stringify(payload)
+    });
+    loadData();
+  });
+
+  tr.querySelector(".cancel-btn").addEventListener("click", loadData);
+}
+
+// Filters + Export
+monthSel.addEventListener("change", loadData);
+yearSel.addEventListener("change", loadData);
+document.getElementById("pdf-export").addEventListener("click", () => {
+  const m = monthSel.value, y = yearSel.value;
+  window.open(`{% url 'training.spending-export-pdf' %}?month=${m}&year=${y}`, "_blank");
+});
+
+// Init
+document.addEventListener("DOMContentLoaded", loadData);
+</script>
+
+
+{% endblock %}

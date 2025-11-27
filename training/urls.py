@@ -15,4 +15,10 @@ urlpatterns = [
     path("requirements/<uuid:id>/edit/", views.editRequirement, name="training.edit-requirement"),
     path("requirements/<uuid:id>/delete/", views.deleteRequirement, name="training.delete-requirement"),
     path('requirements/add/', views.addRequirement, name='training.add-requirement'),
+
+
+    path("spending/", views.spending_page, name="training.spending-page"),
+    path("spending/export/pdf/", views.export_spending_pdf, name="training.spending-export-pdf"),
+    path("api/spending/", views.SpendingMoneyListCreateAPIView.as_view(), name="training.spending-list-api"),
+    path("api/spending/<uuid:pk>/", views.SpendingMoneyDetailAPIView.as_view(), name="training.spending-detail-api"),
 ]
