@@ -28,12 +28,14 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Pyidaungsu font
+# Create folder
 RUN mkdir -p /usr/share/fonts/truetype/myanmar
 
+# Download Pyidaungsu font (direct link)
 RUN wget -O /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf \
-    https://github.com/nginxinc/docker-nginx/blob/master/stable/stretch/font/Pyidaungsu.ttf?raw=true
+    https://github.com/pyidaungsu-fonts/pyidaungsu-unicode/raw/master/2.6.1/Pyidaungsu-2.6.1.ttf
 
+# Refresh font cache
 RUN fc-cache -f -v
 COPY requirements.txt .
 
