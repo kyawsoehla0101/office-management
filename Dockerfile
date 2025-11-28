@@ -28,15 +28,13 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Install fonts directory
+# Create directory for Myanmar fonts
 RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 
-# Copy Pyidaungsu font from your project
-COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/
+# Copy the Pyidaungsu font correctly
+COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
 
-
-
-# Build font cache
+# Build the font cache
 RUN fc-cache -f -v
 
 COPY requirements.txt .
