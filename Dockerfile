@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 
 # Copy Pyidaungsu font from your project
-COPY fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
+COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
+
 
 # Build font cache
 RUN fc-cache -f -v
