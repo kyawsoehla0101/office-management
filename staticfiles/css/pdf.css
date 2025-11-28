@@ -1,0 +1,5 @@
+@font-face {
+  font-family: "Pyidaungsu";
+  src: url("../fonts/Pyidaungsu.ttf") format("truetype");
+}
+body { font-family: "Pyidaungsu", sans-serif; }
