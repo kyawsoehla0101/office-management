@@ -5,11 +5,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies for WeasyPrint + fonts
 RUN apt-get update && apt-get install -y \
     fontconfig \
-    wget \
     build-essential \
+    wget \
     pkg-config \
     python3-dev \
     default-libmysqlclient-dev \
@@ -23,27 +22,19 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt1-dev \
     zlib1g-dev \
-    fonts-dejavu \
-    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Create directory for Myanmar fonts
 RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 
-# Copy the Pyidaungsu font correctly
+# Copy font from STATIC folder
 COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
 
-# Build the font cache
 RUN fc-cache -f -v
 
-# Install Python dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy the project
 COPY . .
 
 EXPOSE 8000
-
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
