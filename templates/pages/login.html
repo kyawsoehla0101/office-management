@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Sign In | Software Engineering Team - II</title>
+    <title>အကောင့်ဝင်ပါ | ကွန်ပျူတာအဖွဲ့</title>
 
     <!-- Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,7 +44,7 @@
     </style>
   </head>
 
-  <body class="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100">
+  <body class="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100" style="font-family: Pyidaungsu, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;">
     <div class="relative min-h-screen flex items-center justify-center p-6">
       <!-- subtle background blobs -->
       <div class="pointer-events-none absolute inset-0 overflow-hidden">
@@ -56,30 +56,30 @@
         <!-- Left panel -->
         <section class="hidden lg:flex flex-col justify-center rounded-3xl bg-white/60 backdrop-blur-xl p-10 shadow-xl ring-1 ring-black/5">
           <div class="mb-6 inline-flex items-center gap-3">
-            <div class="h-10 w-20 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold">War Office</div>
-            <p class="text-sm font-medium text-brand-700">Computer Department</p>
+            <div class="h-10 w-auto px-4 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold">စစ်ရုံးချုပ်</div>
+            <p class="text-sm font-medium text-brand-700">ကွန်ပျူတာအဖွဲ့</p>
           </div>
 
           <h1 class="text-3xl font-extrabold text-gray-900">
-            Welcome back 👋
+            ပြန်လို့ကြိုဆိုပါရေ👋
           </h1>
           <p class="mt-4 text-gray-600 leading-relaxed">
-            Please sign in with your email and password to continue.<br />
-            Don’t have an account yet? You can easily <span class="font-medium text-gray-900">create one below</span>.
+           ဆက်လုပ်ဖို့ သင့်အီးမေးလ်နန့် စကားဝှက်ဖြင့် လက်မှတ်ထိုးဝင်ပါ။<br />
+            <!-- Don’t have an account yet? You can easily <span class="font-medium text-gray-900">create one below</span>. -->
           </p>
 
           <ul class="mt-6 space-y-3 text-gray-700">
             <li class="flex items-start gap-3">
               <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
-              <span>Secure login with modern encryption</span>
+              <span>ခေတ်မှီသောကုဒ်ဝှက်စနစ်နန့် လုံခြုံရေ ဝင်ရောင်မှု</span>
             </li>
             <li class="flex items-start gap-3">
               <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
-              <span>User-friendly interface with intuitive controls</span>
+              <span>အလိုလိုသိနိုင်ရေ ထိန်းချုပ်မှုများနန့် အသုံးပြုရလွယ်ကူရေ အသွင်အပြင်</span>
             </li>
             <li class="flex items-start gap-3">
               <span class="mt-[6px] h-2 w-2 rounded-full bg-brand-500"></span>
-              <span>Fast performance and easy navigation</span>
+              <span>မြန်ဆန်သောစွမ်းဆောင်ရည်နန့် လွယ်ကူစွာ လမ်းညွှန်နိုင်ခြင်း</span>
             </li>
           </ul>
         </section>
@@ -90,8 +90,8 @@
             <div class="flex items-center gap-3">
               <div class="lg:hidden h-10 w-10 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold">SE</div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900">Sign in</h2>
-                <p class="text-gray-600">Access your dashboard and manage your projects seamlessly.</p>
+                <h2 class="text-2xl font-bold text-gray-900">အကောင့်ဝင်ပါ</h2>
+                <p class="text-gray-600">သင့် Dashboard ကို ဝင်ရောင်ကြည့်ရှုပြီး ချော့မွေ့စွာ စီစိုင်လုပ်ဆောင်ပါ။</p>
               </div>
             </div>
           </header>
@@ -108,7 +108,7 @@
             {% csrf_token %}
             <!-- Email -->
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-800">Email address</label>
+              <label for="email" class="block text-sm font-medium text-gray-800">အီးလ်မေး</label>
               <div class="mt-2">
                 <input
                   id="email"
@@ -125,8 +125,8 @@
             <!-- Password -->
             <div>
               <div class="flex items-center justify-between">
-                <label for="password" class="block text-sm font-medium text-gray-800">Password</label>
-                <a href="#" class="text-sm font-medium text-brand-700 hover:text-brand-800">Forgot password?</a>
+                <label for="password" class="block text-sm font-medium text-gray-800">စကားဝှက်</label>
+                <!-- <a href="#" class="text-sm font-medium text-brand-700 hover:text-brand-800">Forgot password?</a> -->
               </div>
               <div class="mt-2 relative">
                 <input
@@ -169,15 +169,15 @@
                 type="submit"
                 class="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300 active:translate-y-px"
               >
-                Sign in
+                အကောင့်ဝင်မည်
               </button>
             </div>
 
             <!-- Footer -->
             <p class="text-xs text-gray-500 leading-relaxed">
-              By signing in, you agree to our
-              <a href="#" class="underline underline-offset-2 hover:text-gray-700">Terms</a> and
-              <a href="#" class="underline underline-offset-2 hover:text-gray-700">Privacy Policy</a>.
+              အကောင့်ဝင်ခြင်းဖြင့် သင်သည် ကျနော်ရို့၏ 
+              <a href="#" class="underline underline-offset-2 hover:text-gray-700">စည်းကမ်းချက်များ</a> နန့်
+              <a href="#" class="underline underline-offset-2 hover:text-gray-700">ကိုယ်ရီးအချက်အလက်မူဝါဒ</a>. အား သဘောတူပါသည်။
             </p>
           </form>
         </section>
