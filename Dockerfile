@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# --- Install system dependencies ---
+# Install system dependencies for WeasyPrint + fonts
 RUN apt-get update && apt-get install -y \
     fontconfig \
     wget \
@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     python3-dev \
     default-libmysqlclient-dev \
-    # --- WeasyPrint deps ---
     libcairo2 \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -37,11 +36,12 @@ COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.tt
 # Build the font cache
 RUN fc-cache -f -v
 
+# Install Python dependencies
 COPY requirements.txt .
-
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the project
 COPY . .
 
 EXPOSE 8000
