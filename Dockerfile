@@ -7,6 +7,8 @@ WORKDIR /app
 
 # --- Install system dependencies ---
 RUN apt-get update && apt-get install -y \
+    fontconfig \
+    wget \
     build-essential \
     pkg-config \
     python3-dev \
@@ -25,6 +27,14 @@ RUN apt-get update && apt-get install -y \
     fonts-dejavu \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Pyidaungsu font
+RUN mkdir -p /usr/share/fonts/truetype/myanmar
+
+RUN wget -O /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf \
+    https://github.com/nginxinc/docker-nginx/blob/master/stable/stretch/font/Pyidaungsu.ttf?raw=true
+
+RUN fc-cache -f -v
 COPY requirements.txt .
 
 RUN pip install --upgrade pip
