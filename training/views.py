@@ -598,7 +598,7 @@ def export_spending_pdf(request):
         qs = qs.filter(year=year)
     total_sum = sum([r.total_cost for r in qs])
     html = render_to_string("pages/training/spending-money/spending_pdf.html", {"records": qs, "total_sum": total_sum, "month": month, "year": year, "current_date": current_date})
-    pdf = HTML(string=html).write_pdf()
+    pdf = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf()
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="training_spending_{month}_{year}.pdf"'
     return response

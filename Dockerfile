@@ -28,15 +28,15 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Create folder
-RUN mkdir -p /usr/share/fonts/truetype/myanmar
+# Install fonts directory
+RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 
-# Download Pyidaungsu font (direct link)
-RUN wget -O /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf \
-    https://github.com/pyidaungsu-fonts/pyidaungsu-unicode/raw/master/2.6.1/Pyidaungsu-2.6.1.ttf
+# Copy Pyidaungsu font from your project
+COPY fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
 
-# Refresh font cache
+# Build font cache
 RUN fc-cache -f -v
+
 COPY requirements.txt .
 
 RUN pip install --upgrade pip

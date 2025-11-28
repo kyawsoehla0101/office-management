@@ -634,7 +634,7 @@ def export_reports_pdf(request):
     }
 
     html = render_to_string("pages/het/reports/repairs_report_pdf.html", context)
-    pdf = HTML(string=html).write_pdf()
+    pdf = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf()
 
     
 
