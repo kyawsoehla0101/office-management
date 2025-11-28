@@ -26,15 +26,17 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 
-# Copy font from STATIC folder
-COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
-
-RUN fc-cache -f -v
-
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# Copy entire project
 COPY . .
+
+# Copy Pyidaungsu font from static folder
+COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
+COPY static/fonts/Pyidaungsu-Regular.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu-Regular.ttf
+
+RUN fc-cache -f -v
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
