@@ -34,7 +34,6 @@ COPY . .
 
 # Copy Pyidaungsu font from static folder
 COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
-COPY static/fonts/Pyidaungsu-Regular.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu-Regular.ttf
 
 RUN fc-cache -f -v
 
