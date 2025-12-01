@@ -82,7 +82,11 @@ dist/
 # ============================
 tmp/
 temp/
-
+# Django
+*.log
+staticfiles/
+media/
+db.sqlite3
 # ============================
 # Compiled templates
 # ============================
