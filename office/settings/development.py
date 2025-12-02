@@ -11,6 +11,19 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'utheinlab2',
+#         'USER': 'oothein',
+#         'PASSWORD': 'uthein123',
+#         'HOST': '192.168.130.200',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'ssl_mode': 'REQUIRED',
+#         },
+#     }
+# }
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_ROOT = BASE_DIR / "media"
