@@ -8,5 +8,5 @@ urlpatterns = [
     path('edit-user/<uuid:user_id>/', views.edit_user, name='admin.edit-user'),
     path('delete-user/<uuid:user_id>/', views.delete_user, name='admin.delete-user'),
     path("users/<uuid:user_id>/change-password/", views.change_user_password, name="change-user-password"),
-
+    path("device/not-allowed/", views.device_not_allowed, name="device_not_allowed"),
 ]

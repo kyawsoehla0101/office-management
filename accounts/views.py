@@ -6,6 +6,29 @@ from django.contrib.auth.decorators import login_required
 from accounts.utils.decorators import role_required
 from .models import CustomUser
 
+
+
+
+# accounts/views.py
+
+from django.shortcuts import render
+
+def device_not_allowed(request):
+    # Middleware က request.office_device = device လို့ attach လုပ်ထားတယ်
+    device = getattr(request, "office_device", None)
+
+    # ဒီကနေ device_id ကို extract လုပ်ပြီး template ကို pass ပေးမယ်
+    context = {
+        "device_id": getattr(device, "device_id", None),
+        "device": device,
+    }
+    return render(request, "accounts/device_not_allowed.html", context, status=403)
+
+
+
+
+
+
 # Login view
 # def login_view(request):
     # if request.method == "POST":

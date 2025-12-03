@@ -73,3 +73,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def is_training(self):
         return self.role == "training"
+
+
+# accounts/models.py
+
+from django.db import models
+from django.conf import settings
+
+class OfficeDevice(models.Model):
+    device_id = models.CharField(max_length=64, unique=True)  # cookie ထဲက ID
+    label = models.CharField(max_length=100, blank=True, help_text="e.g. Kyaw Soe Hla Laptop")
+    note = models.TextField(blank=True)
+    is_allowed = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now=True)
+    last_ip = models.GenericIPAddressField(null=True, blank=True)
+    last_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="office_devices",
+    )
+
+    def __str__(self):
+        status = "✅" if self.is_allowed else "❌"
+        return f"{status} {self.label or self.device_id}"
