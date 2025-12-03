@@ -7,9 +7,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", get_random_secret_key())
 
 DEBUG = False
-ENV = os.environ.get("DJANGO_ENV", "dev")  # dev OR prod
-IS_DEV = ENV == "dev"
-IS_PROD = ENV == "prod"
 
 ALLOWED_HOSTS = []
 
