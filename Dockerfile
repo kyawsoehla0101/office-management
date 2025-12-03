@@ -29,6 +29,10 @@ RUN mkdir -p /usr/share/fonts/truetype/myanmar/
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# Copy entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Copy entire project
 COPY . .
 
@@ -38,4 +42,6 @@ COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.tt
 RUN fc-cache -f -v
 
 EXPOSE 8000
+# ENTRYPOINT handles migrate + collectstatic + gunicorn
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "office.wsgi:application"]
