@@ -14,11 +14,11 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'utheinlab2',
-#         'USER': 'oothein',
-#         'PASSWORD': 'uthein123',
-#         'HOST': '192.168.130.200',
-#         'PORT': '3306',
+#         'NAME': 'defaultdb',
+#         'USER': 'doadmin',
+#         'PASSWORD': 'AVNS_gwogUwAiAF0S5sawMEb',
+#         'HOST': 'office-do-user-22229090-0.h.db.ondigitalocean.com',
+#         'PORT': '25060',
 #         'OPTIONS': {
 #             'ssl_mode': 'REQUIRED',
 #         },

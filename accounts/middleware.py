@@ -74,7 +74,7 @@ class OfficeDeviceMiddleware(MiddlewareMixin):
 
         # 8) NOT ALLOWED → redirect
         if not device.is_allowed:
-            return redirect("/accounts/device/not-allowed/")
+            return redirect("/device/not-allowed/")
 
         return None
 
