@@ -16,12 +16,12 @@ class DynamicSessionTimeoutMiddleware:
 
 # accounts/middleware.py
 
-import uuid
-from django.utils.deprecation import MiddlewareMixin
-from django.utils import timezone
-from django.shortcuts import redirect
+# import uuid
+# from django.utils.deprecation import MiddlewareMixin
+# from django.utils import timezone
+# from django.shortcuts import redirect
 
-from .models import OfficeDevice
+# from .models import OfficeDevice
 
 
 # class OfficeDeviceMiddleware(MiddlewareMixin):
@@ -112,48 +112,30 @@ import uuid
 from django.utils.deprecation import MiddlewareMixin
 from .models import OfficeDevice
 
-import uuid
-from .models import OfficeDevice
+class DeviceCheckMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        device_id = request.COOKIES.get("device_id")
 
-class OfficeDeviceMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-
-        # 1) Read cookie or generate new UUID
-        device_id = request.COOKIES.get("office_device_id")
+        # 1️⃣ device_id cookie မရှိသေး → အသစ် generate
         if not device_id:
-            device_id = str(uuid.uuid4())  # auto generate
-            request.new_device_id = device_id   # save for response
+            device_id = uuid.uuid4().hex
+            request.new_device_id = device_id  # will be set in response
 
-        # 2) Attach device object to request
-        try:
-            device = OfficeDevice.objects.get(device_id=device_id)
-        except OfficeDevice.DoesNotExist:
-            device = None
+        # 2️⃣ DB ထဲက device object ကို load လုပ်
+        device = OfficeDevice.objects.filter(device_id=device_id).first()
 
+        # 3️⃣ request မှာ attach
         request.office_device = device
-        request.device_id = device_id
+        request.device_id = device_id  # very important
+        return None
 
-        # 3) Continue the request/response process
-        response = self.get_response(request)
-
-        # 4) If this request created a new cookie → set it now
+    def process_response(self, request, response):
+        # Cookie မရှိသေးလျှင် response မှာ ယခုက set ပေးမယ်
         if hasattr(request, "new_device_id"):
             response.set_cookie(
-                "office_device_id",
+                "device_id",
                 request.new_device_id,
-                max_age=60 * 60 * 24 * 365,  # 1 YEAR
-                httponly=False,
-                secure=False,  # change to True on HTTPS
-                samesite="Lax",
+                max_age=60 * 60 * 24 * 365,
+                samesite="Lax"
             )
-
         return response
-
-    def _get_ip(self, request):
-        xff = request.META.get("HTTP_X_FORWARDED_FOR")
-        if xff:
-            return xff.split(",")[0].strip()
-        return request.META.get("REMOTE_ADDR")

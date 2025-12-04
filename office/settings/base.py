@@ -43,7 +43,7 @@ MIDDLEWARE = [
 
     'accounts.middleware.DynamicSessionTimeoutMiddleware',
     # 🛡️ Device restriction middleware
-    "accounts.middleware.OfficeDeviceMiddleware",
+    "accounts.middleware.DeviceCheckMiddleware",
 
 ]
 
