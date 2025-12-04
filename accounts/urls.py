@@ -9,4 +9,7 @@ urlpatterns = [
     path('delete-user/<uuid:user_id>/', views.delete_user, name='admin.delete-user'),
     path("users/<uuid:user_id>/change-password/", views.change_user_password, name="change-user-password"),
     path("device/not-allowed/", views.device_not_allowed, name="device_not_allowed"),
+    path("devices/", views.device_list, name="admin.device-list"),
+    path("devices/<int:id>/allow/", views.allow_device, name="device-allow"),
+    path("devices/<int:id>/block/", views.block_device, name="device-block"),
 ]

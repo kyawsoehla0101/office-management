@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from accounts.utils.decorators import role_required
-from .models import CustomUser
-
+from .models import CustomUser, OfficeDevice
+from base.models import SystemSettings
 
 
 
@@ -19,13 +19,38 @@ def device_not_allowed(request):
 
     # ဒီကနေ device_id ကို extract လုပ်ပြီး template ကို pass ပေးမယ်
     context = {
-        "device_id": getattr(device, "device_id", None),
+        "device_id": getattr(request, "device_id", None),
         "device": device,
     }
     return render(request, "accounts/device_not_allowed.html", context, status=403)
 
+@login_required
+@role_required("admin")
+def allow_device(request, id):
+    device = get_object_or_404(OfficeDevice, id=id)
+    device.is_allowed = True
+    device.save()
+    messages.success(request, "Device allowed successfully.")
+    return redirect("admin.device-list")
 
+@login_required
+@role_required("admin")
+def block_device(request, id):
+    device = get_object_or_404(OfficeDevice, id=id)
+    device.is_allowed = False
+    device.save()
+    messages.success(request, "Device blocked successfully.")
+    return redirect("admin.device-list")
 
+@login_required
+@role_required("admin")
+def device_list(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization 
+    
+    # Get all devices
+    devices = OfficeDevice.objects.all()
+    return render(request, "pages/admin/devices/index.html", {"devices": devices, "system_name": system_name, "organization": organization, "active_menu": "admin_device_list"})
 
 
 
@@ -118,9 +143,14 @@ def logout_view(request):
 @login_required(login_url="login")
 @role_required("admin")
 def add_user(request):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization 
     roles = CustomUser.ROLE_CHOICES
     form_data = request.POST or None
     context = {
+        "system_name": system_name,
+        "organization": organization,
+        "active_menu": "admin_add_user",
         "roles": roles,
         "form_data": form_data,
     }
@@ -169,6 +199,10 @@ def add_user(request):
 @login_required(login_url="login")
 @role_required("admin")
 def edit_user(request, user_id):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization 
+    active_menu = "admin_edit_user"
+
     user = get_object_or_404(CustomUser, id=user_id)
     roles = CustomUser.ROLE_CHOICES
 
@@ -181,12 +215,15 @@ def edit_user(request, user_id):
         messages.success(request, f"User '{user.full_name}' updated successfully!")
         return redirect("admin.users")
 
-    return render(request, "pages/admin/edit-user.html", {"user": user, "roles": roles})
+    return render(request, "pages/admin/edit-user.html", {"user": user, "roles": roles, "system_name": system_name, "organization": organization, "active_menu": active_menu})
 
 # Delete user view
 @login_required(login_url="login")
 @role_required("admin")
 def delete_user(request, user_id):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization 
+    active_menu = "admin_delete_user"
     """Only admin can delete users"""
     user = get_object_or_404(CustomUser, id=user_id)
 
@@ -195,12 +232,15 @@ def delete_user(request, user_id):
         messages.success(request, "User deleted successfully!")
         return redirect("admin.users")
 
-    return render(request, "pages/admin/delete-user.html", {"user": user})
+    return render(request, "pages/admin/delete-user.html", {"user": user, "system_name": system_name, "organization": organization, "active_menu": active_menu})
 
 # Change user password view
 @login_required(login_url="login")
 @role_required("admin")
 def change_user_password(request, user_id):
+    system_name = SystemSettings.objects.first().system_name
+    organization = SystemSettings.objects.first().organization 
+    active_menu = "admin_change_password"
     user = get_object_or_404(CustomUser, id=user_id)
 
     if request.method == "POST":
@@ -222,4 +262,4 @@ def change_user_password(request, user_id):
         messages.success(request, f"Password changed successfully for {user.full_name}.")
         return redirect("admin.users")
 
-    return render(request, "pages/admin/change-password.html", {"user": user})
+    return render(request, "pages/admin/change-password.html", {"user": user, "system_name": system_name, "organization": organization, "active_menu": active_menu})

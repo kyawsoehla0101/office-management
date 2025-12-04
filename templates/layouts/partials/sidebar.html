@@ -54,6 +54,22 @@
             ဆက်တင်များ
           </a>
         </li>
+
+        <li>
+          <a href="{% url 'admin.device-list' %}"
+            class="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium
+                   {% if active_menu == 'admin_device_list' %}
+                     bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400
+                   {% else %}
+                     text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800
+                   {% endif %}">
+            <svg class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.6">
+              <path d="M10.325 4.317a1 1 0 011.35 0l1.242 1.04a1 1 0 00.923.16l1.518-.505a1 1 0 011.18.586l.707 1.414a1 1 0 00.83.553l1.6.133a1 1 0 01.9.9l.133 1.6a1 1 0 00.553.83l1.414.707a1 1 0 01.586 1.18l-.505 1.518a1 1 0 00.16.923l1.04 1.242a1 1 0 010 1.35l-1.04 1.242a1 1 0 00-.16.923l.505 1.518a1 1 0 01-.586 1.18l-1.414.707a1 1 0 00-.553.83l-.133 1.6a1 1 0 01-.9.9l-1.6.133a1 1 0 00-.83.553l-.707 1.414a1 1 0 01-1.18.586l-1.518-.505a1 1 0 00-.923.16l-1.242 1.04a1 1 0 01-1.35 0l-1.242-1.04a1 1 0 00-.923-.16l-1.518.505a1 1 0 01-1.18-.586l-.707-1.414a1 1 0 00-.83-.553l-1.6-.133a1 1 0 01-.9-.9l-.133-1.6a1 1 0 00-.553-.83l-1.414-.707a1 1 0 01-.586-1.18l.505-1.518a1 1 0 00-.16-.923L2.11 15.933a1 1 0 010-1.35l1.04-1.242a1 1 0 00.16-.923l-.505-1.518a1 1 0 01.586-1.18l1.414-.707a1 1 0 00.553-.83l.133-1.6a1 1 0 01.9-.9l1.6-.133a1 1 0 00.83-.553l.707-1.414a1 1 0 011.18-.586l1.518.505a1 1 0 00.923-.16l1.242-1.04z" />
+            </svg>
+            Devices
+          </a>
+        </li>
         
         <li>
           <a href="{% url 'admin.all-spending-money' %}"
