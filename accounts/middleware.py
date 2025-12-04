@@ -33,7 +33,7 @@ class OfficeDeviceMiddleware(MiddlewareMixin):
             path.startswith("/static/")
             or path.startswith("/media/")
             or path.startswith("/admin/")
-            or path == "/device/not-allowed/"
+            # or path == "/device/not-allowed/"
         ):
             return None
 
@@ -70,10 +70,15 @@ class OfficeDeviceMiddleware(MiddlewareMixin):
         # -------------------------
         request.device_id = device_id
         request.office_device = device
+ 
 
         # -------------------------
         # 5️⃣ Block if not allowed
         # -------------------------
+
+        if path == "/device/not-allowed/":
+            return None
+
         if not device.is_allowed:
             return redirect("/device/not-allowed/")
 
