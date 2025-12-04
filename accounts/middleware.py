@@ -16,126 +16,84 @@ class DynamicSessionTimeoutMiddleware:
 
 # accounts/middleware.py
 
-# import uuid
-# from django.utils.deprecation import MiddlewareMixin
-# from django.utils import timezone
-# from django.shortcuts import redirect
-
-# from .models import OfficeDevice
-
-
-# class OfficeDeviceMiddleware(MiddlewareMixin):
-#     COOKIE_NAME = "office_device_id"
-
-#     def process_request(self, request):
-
-#         # ---- FIX: always make path a string ----
-#         path = getattr(request, "path", "") or ""
-#         # 1) BYPASS admin
-#         if path.startswith("/admin/"):
-#             return None
-
-#         # 2) BYPASS static/media/favicons
-#         if (
-#             path.startswith("/static/")
-#             or path.startswith("/media/")
-#             or path.startswith("/favicon.")
-#         ):
-#             return None
-
-#         # 3) BYPASS device-not-allowed page itself
-#         # (NO reverse() USED → avoids Render crash)
-#         if "device/not-allowed" in path:
-#             return None
-
-#         # 4) Read device_id from cookie
-#         device_id = request.COOKIES.get(self.COOKIE_NAME)
-#         request.new_device_id = None
-
-#         if not device_id:
-#             device_id = uuid.uuid4().hex
-#             request.new_device_id = device_id
-
-#         # 5) Get or create device record
-#         device, _ = OfficeDevice.objects.get_or_create(
-#             device_id=device_id,
-#             defaults={"is_allowed": False},
-#         )
-
-#         # 6) Update tracking
-#         device.last_seen = timezone.now()
-#         device.last_ip = self._get_ip(request)
-#         if request.user.is_authenticated:
-#             device.last_user = request.user
-#         device.save()
-
-#         # 7) Attach to request for view usage
-#         request.office_device = device
-
-#         # 8) NOT ALLOWED → redirect
-#         if not device.is_allowed:
-#             return redirect("/device/not-allowed/")
-
-#         return None
-
-#     def process_response(self, request, response):
-
-#         device_id = getattr(request, "new_device_id", None)
-
-#         if device_id and hasattr(response, "set_cookie"):
-
-#             # secure flag auto-switch
-#             try:
-#                 secure_flag = request.is_secure()
-#             except:
-#                 secure_flag = False
-
-#             response.set_cookie(
-#                 self.COOKIE_NAME,
-#                 device_id,
-#                 max_age=60 * 60 * 24 * 365,
-#                 httponly=True,
-#                 secure=secure_flag,
-#                 samesite="Lax",
-#             )
-
-#         return response
-
-#     def _get_ip(self, request):
-#         xff = request.META.get("HTTP_X_FORWARDED_FOR")
-#         if xff:
-#             return xff.split(",")[0].strip()
-#         return request.META.get("REMOTE_ADDR")
-
-
 import uuid
 from django.utils.deprecation import MiddlewareMixin
+from django.shortcuts import redirect
+from django.utils import timezone
 from .models import OfficeDevice
 
-class DeviceCheckMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        device_id = request.COOKIES.get("device_id")
+class OfficeDeviceMiddleware(MiddlewareMixin):
+    COOKIE_NAME = "device_id"
 
-        # 1️⃣ device_id cookie မရှိသေး → အသစ် generate
+    def process_request(self, request):
+        path = request.path or ""
+
+        # Allow safe URLs
+        if (
+            path.startswith("/static/")
+            or path.startswith("/media/")
+            or path.startswith("/admin/")
+            or path == "/device/not-allowed/"
+        ):
+            return None
+
+        # -------------------------
+        # 1️⃣ Read cookie
+        # -------------------------
+        device_id = request.COOKIES.get(self.COOKIE_NAME)
+
         if not device_id:
             device_id = uuid.uuid4().hex
-            request.new_device_id = device_id  # will be set in response
+            request.new_device_id = device_id  # will be written in response
 
-        # 2️⃣ DB ထဲက device object ကို load လုပ်
-        device = OfficeDevice.objects.filter(device_id=device_id).first()
+        # -------------------------
+        # 2️⃣ Load or create device record
+        # -------------------------
+        device, created = OfficeDevice.objects.get_or_create(
+            device_id=device_id,
+            defaults={"is_allowed": False}
+        )
 
-        # 3️⃣ request မှာ attach
+        # -------------------------
+        # 3️⃣ Update tracking (IP + last seen)
+        # -------------------------
+        device.last_seen = timezone.now()
+        device.last_ip = self._get_ip(request)
+
+        if request.user.is_authenticated:
+            device.last_user = request.user
+
+        device.save()
+
+        # -------------------------
+        # 4️⃣ Attach for templates and views
+        # -------------------------
+        request.device_id = device_id
         request.office_device = device
-        request.device_id = device_id  # very important
+
+        # -------------------------
+        # 5️⃣ Block if not allowed
+        # -------------------------
+        if not device.is_allowed:
+            return redirect("/device/not-allowed/")
+
         return None
 
     def process_response(self, request, response):
-        # Cookie မရှိသေးလျှင် response မှာ ယခုက set ပေးမယ်
-        if hasattr(request, "new_device_id"):
+        # Set cookie only for new devices
+        if hasattr(request, "new_device_id") and hasattr(response, "set_cookie"):
             response.set_cookie(
-                "device_id",
+                self.COOKIE_NAME,
                 request.new_device_id,
                 max_age=60 * 60 * 24 * 365,
+                httponly=True,
                 samesite="Lax"
             )
         return response
+
+    def _get_ip(self, request):
+        xff = request.META.get("HTTP_X_FORWARDED_FOR")
+        if xff:
+            return xff.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR")
+

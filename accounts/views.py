@@ -16,10 +16,11 @@ from django.shortcuts import render
 def device_not_allowed(request):
     # Middleware က request.office_device = device လို့ attach လုပ်ထားတယ်
     device = getattr(request, "office_device", None)
+    print(device)
 
     # ဒီကနေ device_id ကို extract လုပ်ပြီး template ကို pass ပေးမယ်
     context = {
-        "device_id": getattr(request, "device_id", None),
+        "device_id": request.COOKIES.get("device_id"),
         "device": device,
     }
     return render(request, "accounts/device_not_allowed.html", context, status=403)
