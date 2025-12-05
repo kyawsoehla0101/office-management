@@ -4,10 +4,13 @@
 {% block content %}
 
 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
-    
+
     <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">
         Office Devices Management
     </h2>
+
+    <!-- Hidden CSRF so JS can read it -->
+    <form style="display:none;">{% csrf_token %}</form>
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -26,40 +29,155 @@
             <tbody>
                 {% for d in devices %}
                 <tr class="border-b border-slate-200 dark:border-slate-700">
-                    <td class="px-3 py-2 font-mono text-xs">{{ d.device_id }}</td>
-                    <td class="px-3 py-2">{{ d.label|default:"-" }}</td>
 
+                    <!-- Device ID -->
+                    <td class="px-3 py-2 font-mono text-xs">{{ d.device_id }}</td>
+
+                    <!-- Label (inline editable) -->
                     <td class="px-3 py-2">
-                        {% if d.is_allowed %}
-                            <span class="text-green-600 font-semibold">Allowed</span>
-                        {% else %}
-                            <span class="text-red-600 font-semibold">Blocked</span>
-                        {% endif %}
+                        <span class="label-text cursor-pointer underline decoration-dotted text-slate-700 dark:text-slate-200"
+                              data-id="{{ d.id }}">
+                            {{ d.label|default:"-" }}
+                        </span>
+
+                        <input type="text"
+                               class="label-input hidden px-2 py-1 border rounded w-40 
+                                      bg-white dark:bg-slate-800 
+                                      text-slate-800 dark:text-slate-100 
+                                      border-slate-300 dark:border-slate-600"
+                               data-id="{{ d.id }}"
+                               value="{{ d.label }}">
                     </td>
 
+                    <!-- Allowed toggle -->
+                    <td class="px-3 py-2">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" 
+                                   class="toggle-allow hidden" 
+                                   data-id="{{ d.id }}"
+                                   {% if d.is_allowed %}checked{% endif %}>
+                            <span class="w-11 h-6 flex items-center bg-slate-300 dark:bg-slate-700 rounded-full p-1 duration-300 toggle-bg">
+                                <span class="dot w-4 h-4 bg-white rounded-full shadow transform duration-300"></span>
+                            </span>
+                        </label>
+                    </td>
+
+                    <!-- Last seen -->
                     <td class="px-3 py-2">{{ d.last_seen|date:"Y-m-d H:i:s" }}</td>
+
                     <td class="px-3 py-2">{{ d.last_ip }}</td>
                     <td class="px-3 py-2">{{ d.last_user|default:"-" }}</td>
 
                     <td class="px-3 py-2">
-                        {% if not d.is_allowed %}
-                            <a href="{% url 'device-allow' d.id %}" class="px-3 py-1 bg-green-600 text-white rounded-lg text-xs">Allow</a>
-                        {% else %}
-                            <a href="{% url 'device-block' d.id %}" class="px-3 py-1 bg-red-600 text-white rounded-lg text-xs">Block</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center py-5 text-slate-400">
-                        No devices found
+                        <button data-id="{{ d.id }}" 
+                                class="remove-btn px-3 py-1 bg-red-600 text-white rounded-lg text-xs hover:bg-red-700">
+                            Remove
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    // -------------------------------------------------------------------
+    // 1️⃣ INLINE LABEL EDIT (Dark mode supported)
+    // -------------------------------------------------------------------
+    document.querySelectorAll(".label-text").forEach(el => {
+        el.addEventListener("click", () => {
+            const id = el.dataset.id;
+            const input = document.querySelector(`.label-input[data-id="${id}"]`);
+            el.classList.add("hidden");
+            input.classList.remove("hidden");
+            input.focus();
+        });
+    });
+
+    document.querySelectorAll(".label-input").forEach(input => {
+        const id = input.dataset.id;
+        const text = document.querySelector(`.label-text[data-id="${id}"]`);
+
+        function save() {
+            fetch(`/device/${id}/update-label/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf },
+                body: new URLSearchParams({ label: input.value })
+            })
+            .then(r => r.json())
+            .then(data => {
+                text.textContent = input.value || "-";
+
+                // highlight
+                text.classList.add("bg-green-200", "dark:bg-green-700");
+                setTimeout(() => text.classList.remove("bg-green-200", "dark:bg-green-700"), 800);
+            });
+
+            input.classList.add("hidden");
+            text.classList.remove("hidden");
+        }
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") save();
+            if (e.key === "Escape") {
+                input.classList.add("hidden");
+                text.classList.remove("hidden");
+            }
+        });
+
+        input.addEventListener("blur", save);
+    });
+
+    // -------------------------------------------------------------------
+    // 2️⃣ ALLOW / BLOCK toggle switch
+    // -------------------------------------------------------------------
+    document.querySelectorAll(".toggle-allow").forEach(input => {
+        input.addEventListener("change", () => {
+            const id = input.dataset.id;
+
+            fetch(`/device/${id}/toggle-allow/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf }
+            });
+
+            // animate switch
+            const bg = input.nextElementSibling;
+            const dot = bg.querySelector(".dot");
+
+            if (input.checked) {
+                bg.classList.replace("bg-slate-300", "bg-green-500");
+                bg.classList.replace("dark:bg-slate-700", "dark:bg-green-600");
+                dot.style.transform = "translateX(20px)";
+            } else {
+                bg.classList.replace("bg-green-500", "bg-slate-300");
+                bg.classList.replace("dark:bg-green-600", "dark:bg-slate-700");
+                dot.style.transform = "translateX(0px)";
+            }
+        });
+    });
+
+    // -------------------------------------------------------------------
+    // 3️⃣ REMOVE device
+    // -------------------------------------------------------------------
+    document.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            if (!confirm("Remove this device?")) return;
+
+            fetch(`/device/${id}/remove/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf }
+            })
+            .then(() => window.location.reload());
+        });
+    });
+
+});
+</script>
 
 {% endblock %}

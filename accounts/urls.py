@@ -12,4 +12,6 @@ urlpatterns = [
     path("devices/", views.device_list, name="admin.device-list"),
     path("devices/<int:id>/allow/", views.allow_device, name="device-allow"),
     path("devices/<int:id>/block/", views.block_device, name="device-block"),
+    path("device/<int:pk>/update-label/", views.device_update_label_ajax, name="device-update-label"),
+
 ]

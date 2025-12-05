@@ -7,7 +7,21 @@ from accounts.utils.decorators import role_required
 from .models import CustomUser, OfficeDevice
 from base.models import SystemSettings
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import OfficeDevice
 
+@require_POST
+def device_update_label_ajax(request, pk):
+    device = OfficeDevice.objects.filter(id=pk).first()
+    if not device:
+        return JsonResponse({"success": False, "error": "Device not found"}, status=404)
+
+    label = request.POST.get("label", "").strip()
+    device.label = label
+    device.save()
+
+    return JsonResponse({"success": True, "label": label})
 
 # accounts/views.py
 
