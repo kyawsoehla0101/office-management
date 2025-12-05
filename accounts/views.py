@@ -7,6 +7,62 @@ from accounts.utils.decorators import role_required
 from .models import CustomUser, OfficeDevice
 from base.models import SystemSettings
 
+
+
+
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import OfficeDevice
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def device_toggle_allow(request, id):
+    device = get_object_or_404(OfficeDevice, id=id)
+
+    device.is_allowed = not device.is_allowed
+    device.save()
+
+    return JsonResponse({
+        "success": True,
+        "allowed": device.is_allowed
+    })
+
+
+@login_required
+def device_update_label(request, id):
+    device = get_object_or_404(OfficeDevice, id=id)
+
+    label = request.POST.get("label", "").strip()
+    device.label = label
+    device.save()
+
+    return JsonResponse({"success": True})
+
+
+@login_required
+def device_remove(request, id):
+    device = get_object_or_404(OfficeDevice, id=id)
+    device.delete()
+
+    return JsonResponse({"success": True})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .models import OfficeDevice

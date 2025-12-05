@@ -14,4 +14,8 @@ urlpatterns = [
     path("devices/<int:id>/block/", views.block_device, name="device-block"),
     path("device/<int:pk>/update-label/", views.device_update_label_ajax, name="device-update-label"),
 
+    path("device/<int:id>/toggle-allow/", views.device_toggle_allow, name="device-toggle"),
+    path("device/<int:id>/update-label/", views.device_update_label, name="device-update-label"),
+    path("device/<int:id>/remove/", views.device_remove, name="device-remove"),
+
 ]

@@ -50,17 +50,39 @@
                     </td>
 
                     <!-- Allowed toggle -->
+                    <!-- <td class="px-3 py-2">
+                        <label class="inline-flex items-center cursor-pointer select-none">
+    <input type="checkbox"
+           class="toggle-allow sr-only peer"
+           data-id="{{ d.id }}"
+           {% if d.is_allowed %}checked{% endif %}>
+
+    <div class="w-11 h-6 rounded-full bg-slate-300 dark:bg-slate-700 
+                peer-checked:bg-green-500 peer-checked:dark:bg-green-600 
+                relative transition">
+
+        <div class="dot absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow 
+                    transition-transform duration-300 
+                    peer-checked:translate-x-5"></div>
+    </div>
+</label>
+
+                    </td> -->
+
                     <td class="px-3 py-2">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" 
-                                   class="toggle-allow hidden" 
-                                   data-id="{{ d.id }}"
-                                   {% if d.is_allowed %}checked{% endif %}>
-                            <span class="w-11 h-6 flex items-center bg-slate-300 dark:bg-slate-700 rounded-full p-1 duration-300 toggle-bg">
-                                <span class="dot w-4 h-4 bg-white rounded-full shadow transform duration-300"></span>
-                            </span>
-                        </label>
-                    </td>
+    <label class="inline-flex items-center cursor-pointer">
+        <input type="checkbox"
+               class="toggle-allow hidden"
+               data-id="{{ d.id }}"
+               {% if d.is_allowed %}checked{% endif %}>
+
+        <span class="toggle-bg w-11 h-6 flex items-center rounded-full p-1 duration-300 
+                     bg-slate-300 dark:bg-slate-700">
+            <span class="dot w-4 h-4 bg-white rounded-full shadow transform duration-300"></span>
+        </span>
+    </label>
+</td>
+
 
                     <!-- Last seen -->
                     <td class="px-3 py-2">{{ d.last_seen|date:"Y-m-d H:i:s" }}</td>
@@ -86,98 +108,53 @@
 document.addEventListener("DOMContentLoaded", () => {
     const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-    // -------------------------------------------------------------------
-    // 1️⃣ INLINE LABEL EDIT (Dark mode supported)
-    // -------------------------------------------------------------------
-    document.querySelectorAll(".label-text").forEach(el => {
-        el.addEventListener("click", () => {
-            const id = el.dataset.id;
-            const input = document.querySelector(`.label-input[data-id="${id}"]`);
-            el.classList.add("hidden");
-            input.classList.remove("hidden");
-            input.focus();
-        });
-    });
+    // ---------------------------------------------------------
+    //  APPLY INITIAL SWITCH UI STATE
+    // ---------------------------------------------------------
+    document.querySelectorAll(".toggle-allow").forEach(input => {
+        const bg = input.nextElementSibling;
+        const dot = bg.querySelector(".dot");
 
-    document.querySelectorAll(".label-input").forEach(input => {
-        const id = input.dataset.id;
-        const text = document.querySelector(`.label-text[data-id="${id}"]`);
-
-        function save() {
-            fetch(`/device/${id}/update-label/`, {
-                method: "POST",
-                headers: { "X-CSRFToken": csrf },
-                body: new URLSearchParams({ label: input.value })
-            })
-            .then(r => r.json())
-            .then(data => {
-                text.textContent = input.value || "-";
-
-                // highlight
-                text.classList.add("bg-green-200", "dark:bg-green-700");
-                setTimeout(() => text.classList.remove("bg-green-200", "dark:bg-green-700"), 800);
-            });
-
-            input.classList.add("hidden");
-            text.classList.remove("hidden");
+        if (input.checked) {
+            bg.classList.remove("bg-slate-300", "dark:bg-slate-700");
+            bg.classList.add("bg-green-500", "dark:bg-green-600");
+            dot.style.transform = "translateX(20px)";
+        } else {
+            bg.classList.remove("bg-green-500", "dark:bg-green-600");
+            bg.classList.add("bg-slate-300", "dark:bg-slate-700");
+            dot.style.transform = "translateX(0px)";
         }
-
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") save();
-            if (e.key === "Escape") {
-                input.classList.add("hidden");
-                text.classList.remove("hidden");
-            }
-        });
-
-        input.addEventListener("blur", save);
     });
 
-    // -------------------------------------------------------------------
-    // 2️⃣ ALLOW / BLOCK toggle switch
-    // -------------------------------------------------------------------
+    // ---------------------------------------------------------
+    //  TOGGLE SWITCH — AJAX + UI
+    // ---------------------------------------------------------
     document.querySelectorAll(".toggle-allow").forEach(input => {
         input.addEventListener("change", () => {
             const id = input.dataset.id;
+            const bg = input.nextElementSibling;
+            const dot = bg.querySelector(".dot");
 
+            // Backend update
             fetch(`/device/${id}/toggle-allow/`, {
                 method: "POST",
                 headers: { "X-CSRFToken": csrf }
             });
 
-            // animate switch
-            const bg = input.nextElementSibling;
-            const dot = bg.querySelector(".dot");
-
+            // Update UI
             if (input.checked) {
-                bg.classList.replace("bg-slate-300", "bg-green-500");
-                bg.classList.replace("dark:bg-slate-700", "dark:bg-green-600");
+                bg.classList.remove("bg-slate-300", "dark:bg-slate-700");
+                bg.classList.add("bg-green-500", "dark:bg-green-600");
                 dot.style.transform = "translateX(20px)";
             } else {
-                bg.classList.replace("bg-green-500", "bg-slate-300");
-                bg.classList.replace("dark:bg-green-600", "dark:bg-slate-700");
+                bg.classList.remove("bg-green-500", "dark:bg-green-600");
+                bg.classList.add("bg-slate-300", "dark:bg-slate-700");
                 dot.style.transform = "translateX(0px)";
             }
         });
     });
-
-    // -------------------------------------------------------------------
-    // 3️⃣ REMOVE device
-    // -------------------------------------------------------------------
-    document.querySelectorAll(".remove-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const id = btn.dataset.id;
-            if (!confirm("Remove this device?")) return;
-
-            fetch(`/device/${id}/remove/`, {
-                method: "POST",
-                headers: { "X-CSRFToken": csrf }
-            })
-            .then(() => window.location.reload());
-        });
-    });
-
 });
+
 </script>
 
 {% endblock %}
