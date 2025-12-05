@@ -108,6 +108,85 @@
 document.addEventListener("DOMContentLoaded", () => {
     const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
+    // -------------------------------------------------------------------
+    // 1️⃣ INLINE LABEL EDIT (Dark mode supported)
+    // -------------------------------------------------------------------
+    document.querySelectorAll(".label-text").forEach(el => {
+        el.addEventListener("click", () => {
+            const id = el.dataset.id;
+            const input = document.querySelector(`.label-input[data-id="${id}"]`);
+            el.classList.add("hidden");
+            input.classList.remove("hidden");
+            input.focus();
+        });
+    });
+
+    document.querySelectorAll(".label-input").forEach(input => {
+        const id = input.dataset.id;
+        const text = document.querySelector(`.label-text[data-id="${id}"]`);
+
+        function save() {
+            fetch(`/device/${id}/update-label/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf },
+                body: new URLSearchParams({ label: input.value })
+            })
+            .then(r => r.json())
+            .then(data => {
+                text.textContent = input.value || "-";
+
+                // highlight
+                text.classList.add("bg-green-200", "dark:bg-green-700");
+                setTimeout(() => text.classList.remove("bg-green-200", "dark:bg-green-700"), 800);
+            });
+
+            input.classList.add("hidden");
+            text.classList.remove("hidden");
+        }
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") save();
+            if (e.key === "Escape") {
+                input.classList.add("hidden");
+                text.classList.remove("hidden");
+            }
+        });
+
+        input.addEventListener("blur", save);
+    });
+
+    // // -------------------------------------------------------------------
+    // // 2️⃣ ALLOW / BLOCK toggle switch
+    // // -------------------------------------------------------------------
+    // document.querySelectorAll(".toggle-allow").forEach(input => {
+    //     input.addEventListener("change", () => {
+    //         const id = input.dataset.id;
+
+    //         fetch(`/device/${id}/toggle-allow/`, {
+    //             method: "POST",
+    //             headers: { "X-CSRFToken": csrf }
+    //         });
+
+    //         // animate switch
+    //         const bg = input.nextElementSibling;
+    //         const dot = bg.querySelector(".dot");
+
+    //         if (input.checked) {
+    //             bg.classList.replace("bg-slate-300", "bg-green-500");
+    //             bg.classList.replace("dark:bg-slate-700", "dark:bg-green-600");
+    //             dot.style.transform = "translateX(20px)";
+    //         } else {
+    //             bg.classList.replace("bg-green-500", "bg-slate-300");
+    //             bg.classList.replace("dark:bg-green-600", "dark:bg-slate-700");
+    //             dot.style.transform = "translateX(0px)";
+    //         }
+    //     });
+    // });
+
+
+
+
+
     // ---------------------------------------------------------
     //  APPLY INITIAL SWITCH UI STATE
     // ---------------------------------------------------------
@@ -153,8 +232,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-});
 
+    // -------------------------------------------------------------------
+    // 3️⃣ REMOVE device
+    // -------------------------------------------------------------------
+    document.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            if (!confirm("Remove this device?")) return;
+
+            fetch(`/device/${id}/remove/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf }
+            })
+            .then(() => window.location.reload());
+        });
+    });
+
+});
 </script>
 
 {% endblock %}
