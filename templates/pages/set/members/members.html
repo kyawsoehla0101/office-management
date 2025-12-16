@@ -1,4 +1,5 @@
 {% extends 'layouts/main.html' %}
+{% load static %}
 {% block title %}
   တပ်ဖွဲ့ဝင်များ
 {% endblock %}
@@ -97,7 +98,11 @@
         <tr class="relative bg-white border-b dark:bg-slate-900 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
           <td class="py-4 px-6">{{ forloop.counter|mynum }}</td>
           <td class="py-4 px-6">
-            <img src="{{ member.get_profile_photo_url|default:'/static/profile/default-profile.png' }}" alt="{{ member.full_name }}" class="w-12 h-12 rounded-full">
+            {% if member.profile_photo %}
+              <img src="{{member.profile_photo.url}}" alt="{{ member.full_name }}" class="w-12 h-12 rounded-full">
+            {% else %}
+              <img src="{% static 'profile/default-profile.png' %}" alt="{{ member.full_name }}" class="w-12 h-12 rounded-full">
+            {% endif %}
           </td>
           <td class="py-4 px-6">{{ member.reg_no|default:"-" }}</td>
           <td class="py-4 px-6">{{ member.get_rank_display|default:"Civilian" }}</td>

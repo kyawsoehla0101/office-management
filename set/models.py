@@ -5,6 +5,7 @@ from accounts.models import CustomUser   # link with your user table
 from base.models import BaseMonthlySpendingMoney
 from django.utils import timezone
 
+
 class Member(models.Model):
     GENDER_CHOICES = [
         ('male', 'ကျား'),

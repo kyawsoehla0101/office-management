@@ -24,9 +24,6 @@ INSTALLED_APPS = [
     'accounts',
     'het',
     'training',
-    # Cloudinary
-    "cloudinary",
-    "cloudinary_storage",
 ]
 
 REST_FRAMEWORK = {
@@ -47,7 +44,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'accounts.middleware.DynamicSessionTimeoutMiddleware',
-    # 🛡️ Device restriction middleware
+    # Device restriction middleware
 
 ]
 
@@ -85,25 +82,10 @@ TIME_ZONE = 'Asia/Yangon'
 USE_I18N = True
 USE_TZ = True
 
+# Static still served by WhiteNoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
-
-# ✅ Media files go to Cloudinary
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-# ✅ Static still served by WhiteNoise
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
