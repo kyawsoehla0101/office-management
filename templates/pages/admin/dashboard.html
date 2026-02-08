@@ -129,21 +129,30 @@
     <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Team Performance</h2>
     <div class="space-y-4 text-sm">
       <div>
-        <p class="text-gray-600 dark:text-gray-400">Software Team</p>
+        <div class="flex justify-between items-center">
+          <p class="text-gray-600 dark:text-gray-400">Software Team</p>
+          <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ software_progress }}%</span>
+        </div>
         <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
-          <div class="bg-blue-600 h-2 rounded-full" style="width: {{ software_progress|default:80 }}%"></div>
+          <div class="bg-blue-600 h-2 rounded-full" style="width: {{ software_progress }}%"></div>
         </div>
       </div>
       <div>
-        <p class="text-gray-600 dark:text-gray-400">Hardware Team</p>
+        <div class="flex justify-between items-center">
+          <p class="text-gray-600 dark:text-gray-400">Hardware Team</p>
+          <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ hardware_progress }}%</span>
+        </div>
         <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
-          <div class="bg-green-600 h-2 rounded-full" style="width: {{ hardware_progress|default:65 }}%"></div>
+          <div class="bg-green-600 h-2 rounded-full" style="width: {{ hardware_progress }}%"></div>
         </div>
       </div>
       <div>
-        <p class="text-gray-600 dark:text-gray-400">Training Team</p>
+        <div class="flex justify-between items-center">
+          <p class="text-gray-600 dark:text-gray-400">Training Team</p>
+          <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ training_progress }}%</span>
+        </div>
         <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
-          <div class="bg-amber-500 h-2 rounded-full" style="width: {{ training_progress|default:90 }}%"></div>
+          <div class="bg-amber-500 h-2 rounded-full" style="width: {{ training_progress }}%"></div>
         </div>
       </div>
     </div>

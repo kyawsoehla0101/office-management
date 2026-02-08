@@ -68,6 +68,12 @@
       background: #0002;
       border-radius: 8px
     }
+    #layoutGrid.sidebar-collapsed #sidebar {
+      display: none;
+    }
+    #layoutGrid.sidebar-collapsed main {
+      grid-column: 1 / -1 !important;
+    }
   </style>
 </head>
 
@@ -76,7 +82,7 @@
     <!-- Topbar -->
     {% include 'layouts/partials/header.html' %}
 
-    <div class="mx-auto grid max-w-12xl grid-cols-12 gap-4 px-4 py-6">
+    <div id="layoutGrid" class="mx-auto grid max-w-12xl grid-cols-12 gap-4 px-4 py-6">
       <!-- Sidebar -->
       {% include 'layouts/partials/sidebar.html' %}
 
@@ -89,17 +95,10 @@
   </div>
 
   <script>
-    // Sidebar toggle (simple hide/show on mobile)
     const btnSidebar = document.getElementById('btnSidebar');
-    const sidebar = document.getElementById('sidebar');
-    function updateSidebar() {
-      if (window.innerWidth < 768) {
-        sidebar.classList.toggle('hidden');
-      }
-    }
-    btnSidebar.addEventListener('click', updateSidebar);
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768) sidebar.classList.remove('hidden');
+    const layoutGrid = document.getElementById('layoutGrid');
+    btnSidebar && layoutGrid && btnSidebar.addEventListener('click', function () {
+      layoutGrid.classList.toggle('sidebar-collapsed');
     });
 
     // Theme toggle

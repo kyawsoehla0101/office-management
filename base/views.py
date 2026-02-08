@@ -14,6 +14,8 @@ import calendar
 from set.models import Member as SetMember
 from het.models import Member as HetMember
 from training.models import Member as TrainingMember
+from set.models import Project
+from het.models import HardwareRepair
 from .utils import date_utils
 from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 from calendar import month_name
@@ -36,6 +38,19 @@ def dashboard(request):
     total_het_members = HetMember.objects.all().count()
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
+    software_projects = Project.objects.all()
+    software_progress = 0
+    if software_projects.exists():
+        total_progress = sum(p.progress for p in software_projects)
+        software_progress = int(round(total_progress / software_projects.count()))
+    repairs_qs = HardwareRepair.objects.all()
+    hardware_progress = 0
+    if repairs_qs.exists():
+        completed_count = repairs_qs.filter(status="completed").count()
+        hardware_progress = int(round((completed_count / repairs_qs.count()) * 100))
+    training_total = TrainingMember.objects.count()
+    training_active = TrainingMember.objects.filter(is_active=True).count()
+    training_progress = int(round((training_active / training_total) * 100)) if training_total else 0
     context = {
         "system_name": system_name,
         "organization": organization,
@@ -52,12 +67,13 @@ def dashboard(request):
         "total_departments": total_departments,
         "total_members": total_members,
         "total_projects": 19,
-        "software_progress": 80,
-        "hardware_progress": 65,
-        "training_progress": 90,
+        "software_progress": software_progress,
+        "hardware_progress": hardware_progress,
+        "training_progress": training_progress,
         "notifications": [
             {"message": "New user registered for training program", "level": "info", "timestamp": timezone.now() - timedelta(hours=1)},
             {"message": "Hardware inventory needs review", "level": "warning", "timestamp": timezone.now() - timedelta(hours=3)},
+            {"message": "System maintenance scheduled at 8 PM", "level": "warning", "timestamp": timezone.now() - timedelta(minutes=30)},
         ],
         "recent_actions": [
             {"type": "add", "message": "Added new Software project 'Quick Chat'", "timestamp": timezone.now() - timedelta(hours=2)},

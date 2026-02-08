@@ -55,7 +55,7 @@ def dashboard(request):
 def members(request):
     system_name = SystemSettings.objects.first().system_name
     organization = SystemSettings.objects.first().organization
-    members = Member.objects.all()
+    members = Member.objects.all().order_by('-rank', 'reg_no')
     total_members = members.count()
     total_active_members = members.filter(is_active=True).count()
     total_inactive_members = members.filter(is_active=False).count()
