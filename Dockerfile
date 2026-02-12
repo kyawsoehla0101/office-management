@@ -1,47 +1,70 @@
-FROM python:3.11-slim-bookworm
+# Stage 1: Builder
+FROM python:3.11-slim-bookworm as builder
+
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
-
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
-    fontconfig \
     build-essential \
-    wget \
     pkg-config \
     python3-dev \
     default-libmysqlclient-dev \
-    libcairo2 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libgdk-pixbuf-2.0-0 \
     libffi-dev \
-    shared-mime-info \
-    libxml2 \
     libxml2-dev \
     libxslt1-dev \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/share/fonts/truetype/myanmar/
-
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
-# Copy entrypoint
+
+# Stage 2: Final
+FROM python:3.11-slim-bookworm
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    default-libmysqlclient-dev \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf-2.0-0 \
+    shared-mime-info \
+    libxml2 \
+    fontconfig \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy wheels from builder
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache /wheels/*
+
+# Create fonts directory and copy fonts
+RUN mkdir -p /usr/share/fonts/truetype/myanmar/
+COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
+RUN fc-cache -f -v
+
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Copy entire project
+# Copy project
 COPY . .
 
-# Copy Pyidaungsu font from static folder
-COPY static/fonts/Pyidaungsu.ttf /usr/share/fonts/truetype/myanmar/Pyidaungsu.ttf
-
-RUN fc-cache -f -v
-
+# Expose port
 EXPOSE 8000
-# ENTRYPOINT handles migrate + collectstatic + gunicorn
+
+# Set entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "office.wsgi:application"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "office.wsgi:application"]

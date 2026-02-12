@@ -1,0 +1,36 @@
+services:
+  web:
+    build: .
+    # command: gunicorn office.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_ENV=development
+      # - DB_HOST=db
+      # - DB_NAME=office_db
+      # - DB_USER=office_user
+      # - DB_PASSWORD=office_pass
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: office_db
+      MYSQL_USER: office_user
+      MYSQL_PASSWORD: office_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  static_volume:
+  media_volume:
+  mysql_data:

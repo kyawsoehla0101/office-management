@@ -21,6 +21,7 @@ DATABASES = {
         'PASSWORD': os.environ.get("DB_PASSWORD"),
         'HOST': os.environ.get("DB_HOST"),
         'PORT': os.environ.get("DB_PORT", "25060"),
+        'CONN_MAX_AGE': 600,  # Persist connections for 10 minutes
         'OPTIONS': {
             'ssl_mode': 'REQUIRED',
         },
