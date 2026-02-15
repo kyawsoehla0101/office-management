@@ -20,8 +20,7 @@ from django.db.models import F
 from base.models import SystemSettings
 from django.contrib.auth.decorators import login_required
 from base.utils import date_utils
-
-
+from base.utils.sort_utils import sort_members_custom
 
 # Dashboard View
 @role_required("het","admin")
@@ -61,11 +60,14 @@ def members(request):
     total_inactive_members = members.filter(is_active=False).count()
     total_male_members = members.filter(gender='male').count()
     total_female_members = members.filter(gender='female').count()
+    
+    sorted_members = sort_members_custom(members)
+    
     context = {
         "system_name": system_name,
         "organization": organization,
         "active_menu": "het_members",
-        "members": members,
+        "members": sorted_members,
         "total_members": total_members,
         "total_active_members": total_active_members,
         "total_inactive_members": total_inactive_members,

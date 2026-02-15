@@ -27,6 +27,7 @@ from base.utils import date_utils
 from .models import Project, SoftwareActivity
 from .activity import log_activity_dev
 from base.utils.date_utils import to_myanmar_date
+from base.utils.sort_utils import sort_members_custom
 
 # SET Index View
 @role_required("set", "admin")
@@ -95,8 +96,11 @@ def members(request):
     total_positions = members.values_list("position", flat=True).distinct().count()
     total_inactive_members = members.filter(is_active=False).count()    
 
+    # Apply custom sorting (AC first, then Number ascending)
+    sorted_members = sort_members_custom(members)
+
     context = {
-        "members": members,
+        "members": sorted_members,
         "total_members": len(members),
         "total_projects": 8,
         "total_departments": 2,

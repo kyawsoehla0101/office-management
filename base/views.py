@@ -27,6 +27,7 @@ from .utils.date_utils import to_myanmar_date_formatted
 from rest_framework import generics, permissions
 from datetime import datetime
 from .serializers import SpendingMoneySerializer
+from .utils.sort_utils import sort_members_custom
 
 # Dashboard View
 @login_required(login_url="/")
@@ -429,9 +430,9 @@ def export_spending_pdf(request):
 @login_required(login_url="/")
 @role_required("admin")
 def all_team_members(request):
-    set_members = SetMember.objects.all()
-    het_members = HetMember.objects.all()
-    training_members = TrainingMember.objects.all()
+    set_members = sort_members_custom(SetMember.objects.all())
+    het_members = sort_members_custom(HetMember.objects.all())
+    training_members = sort_members_custom(TrainingMember.objects.all())
     return render(request, "pages/admin/team_members.html", {
         "set_members": set_members,
         "het_members": het_members,

@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 from datetime import datetime
 from django.http import HttpResponse
+from base.utils.sort_utils import sort_members_custom
 @login_required 
 @role_required("admin", "training")
 def index(request):
@@ -57,8 +58,10 @@ def members(request):
     total_positions = members.values_list("position", flat=True).distinct().count()
     total_inactive_members = members.filter(is_active=False).count()    
 
+    sorted_members = sort_members_custom(members)
+
     context = {
-        "members": members,
+        "members": sorted_members,
         "total_members": len(members),
         "total_projects": 8,
         "total_departments": 2,
