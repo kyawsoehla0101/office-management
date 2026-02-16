@@ -14,16 +14,16 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get("DB_NAME", "defaultdb"),
-        'USER': os.environ.get("DB_USER", "doadmin"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"),
-        'HOST': os.environ.get("DB_HOST"),
-        'PORT': os.environ.get("DB_PORT", "25060"),
-        'CONN_MAX_AGE': 600,  # Persist connections for 10 minutes
-        'OPTIONS': {
-            'ssl_mode': 'REQUIRED',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("DB_NAME", "defaultdb"),
+        "USER": os.environ.get("DB_USER", "doadmin"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT", "25060"),
+        "CONN_MAX_AGE": 600,
+        "OPTIONS": {
+            "ssl_mode": "REQUIRED",
         },
     }
 }
@@ -48,4 +48,12 @@ STATICFILES_DIRS = [
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Cloud storage for media files (profile photos, uploads)
+if os.environ.get("CLOUDINARY_URL"):
+    INSTALLED_APPS += [
+        "cloudinary",
+        "cloudinary_storage",
+    ]
+
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
