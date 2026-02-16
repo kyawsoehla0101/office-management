@@ -1,4 +1,5 @@
 {% extends "layouts/main.html" %}
+{% load static %}
 {% block title %}
   တပ်ဖွဲ့ဝင်များ
 {% endblock %}
@@ -20,20 +21,26 @@
         <thead class="text-xs uppercase bg-blue-100 dark:bg-slate-800 text-blue-900 dark:text-blue-400">
           <tr>
             <th class="py-3 px-6">#</th>
+            <th class="py-3 px-6">ပုံ</th>
             <th class="py-3 px-6">ကိုယ်ပိုင်အမှတ်</th>
             <th class="py-3 px-6">အဆင့်</th>
             <th class="py-3 px-6">နာမေ</th>
-            <!-- <th class="py-3 px-6">အီးမေး</th> -->
           </tr>
         </thead>
         <tbody>
           {% for m in set_members %}
           <tr class="bg-white border-b dark:bg-slate-900 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
             <td class="py-3 px-6">{{ forloop.counter }}</td>
-            <td class="py-3 px-6">{{ m.reg_no }}</td>
-            <td class="py-3 px-6">{{ m.get_rank_display }}</td>
+            <td class="py-3 px-6">
+              {% if m.profile_photo %}
+                <img src="{{ m.profile_photo.url }}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% else %}
+                <img src="{% static 'profile/default-profile.png' %}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% endif %}
+            </td>
+            <td class="py-3 px-6">{{ m.reg_no|default:"-" }}</td>
+            <td class="py-3 px-6">{{ m.get_rank_display|default:"" }}</td>
             <td class="py-3 px-6 font-medium">{{ m.full_name }}</td>
-            <!-- <td class="py-3 px-6">{{ m.email|default:"-" }}</td> -->
           </tr>
           {% empty %}
           <tr><td colspan="5" class="py-6 text-center text-slate-500 dark:text-slate-400">SET အဖွဲ့ဝင် မရှိပါ</td></tr>
@@ -54,20 +61,26 @@
         <thead class="text-xs uppercase bg-green-100 dark:bg-slate-800 text-green-900 dark:text-green-400">
           <tr>
             <th class="py-3 px-6">#</th>
+            <th class="py-3 px-6">ပုံ</th>
             <th class="py-3 px-6">ကိုယ်ပိုင်အမှတ်</th>
             <th class="py-3 px-6">အဆင့်</th>
             <th class="py-3 px-6">နာမေ</th>
-            <!-- <th class="py-3 px-6">အီးမေး</th> -->
           </tr>
         </thead>
         <tbody>
           {% for m in het_members %}
           <tr class="bg-white border-b dark:bg-slate-900 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
             <td class="py-3 px-6">{{ forloop.counter }}</td>
-            <td class="py-3 px-6">{{ m.reg_no }}</td>
-            <td class="py-3 px-6">{{ m.get_rank_display }}</td>
+            <td class="py-3 px-6">
+              {% if m.profile_photo %}
+                <img src="{{ m.profile_photo.url }}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% else %}
+                <img src="{% static 'profile/default-profile.png' %}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% endif %}
+            </td>
+            <td class="py-3 px-6">{{ m.reg_no|default:"-" }}</td>
+            <td class="py-3 px-6">{{ m.get_rank_display|default:"" }}</td>
             <td class="py-3 px-6 font-medium">{{ m.full_name }}</td>
-            <!-- <td class="py-3 px-6">{{ m.email|default:"-" }}</td> -->
           </tr>
           {% empty %}
           <tr><td colspan="5" class="py-6 text-center text-slate-500 dark:text-slate-400">HET အဖွဲဝင် မရှိပါ</td></tr>
@@ -88,21 +101,26 @@
         <thead class="text-xs uppercase bg-amber-100 dark:bg-slate-800 text-amber-900 dark:text-amber-400">
           <tr>
             <th class="py-3 px-6">#</th>
+            <th class="py-3 px-6">ပုံ</th>
             <th class="py-3 px-6">ကိုယ်ပိုင်အမှတ်</th>
             <th class="py-3 px-6">အဆင့်</th>
             <th class="py-3 px-6">နာမေ</th>
-            <!-- <th class="py-3 px-6">အီးမေး</th> -->
           </tr>
         </thead>
         <tbody>
           {% for m in training_members %}
           <tr class="bg-white border-b dark:bg-slate-900 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
             <td class="py-3 px-6">{{ forloop.counter }}</td>
+            <td class="py-3 px-6">
+              {% if m.profile_photo %}
+                <img src="{{ m.profile_photo.url }}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% else %}
+                <img src="{% static 'profile/default-profile.png' %}" alt="{{ m.full_name }}" class="w-10 h-10 rounded-full">
+              {% endif %}
+            </td>
             <td class="py-3 px-6">{{ m.reg_no|default:"အရပ်သား" }}</td>
             <td class="py-3 px-6">{{ m.get_rank_display|default:"" }}</td>
             <td class="py-3 px-6 font-medium">{{ m.full_name }}</td>
-            <!-- <td class="py-3 px-6">{{ m.email|default:"-" }}</td> -->
-          </tr>
           {% empty %}
           <tr><td colspan="5" class="py-6 text-center text-slate-500 dark:text-slate-400">Training အဖွဲ့ဝင် မရှိပါ</td></tr>
           {% endfor %}
